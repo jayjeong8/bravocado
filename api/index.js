@@ -9,6 +9,10 @@ const receiver = new ExpressReceiver({
     processBeforeResponse: true,
 });
 
+// 👇 이 로그 코드를 추가해서 배포 후 Vercel 로그를 확인하세요.
+console.log('Bot Token Check:', process.env.SLACK_BOT_TOKEN ? 'Exist' : 'Missing');
+console.log('Token starts with:', process.env.SLACK_BOT_TOKEN?.substring(0, 5));
+
 const app = new App({
     token: process.env.SLACK_BOT_TOKEN,
     receiver: receiver,
@@ -59,8 +63,22 @@ app.command('/leaderboard', async ({ ack, say }) => {
     await say(msg);
 });
 
-// Vercel Entry Point
 module.exports = async (req, res) => {
-    if (req.method === 'POST') await receiver.requestHandler(req, res);
-    else res.status(200).send('Bravocado is running! 🥑');
+    // 디버깅을 위해 로그를 찍어봅니다 (Vercel 로그에서 확인 가능)
+    console.log('Incoming Request Body:', JSON.stringify(req.body));
+
+    // 1. 슬랙의 URL 검증(Challenge) 요청을 최우선으로 처리
+    // 이 부분이 없으면 Bolt가 서명 검증을 하다가 실패할 수 있습니다.
+    if (req.body && req.body.type === 'url_verification') {
+        return res.status(200).json({ challenge: req.body.challenge });
+    }
+
+    // 2. 일반적인 봇 이벤트 처리
+    if (req.method === 'POST') {
+        // Bolt가 요청을 처리하도록 넘김
+        await receiver.requestHandler(req, res);
+    } else {
+        // 3. 브라우저 접속 시 (GET 요청)
+        res.status(200).send('Bravocado is running! 🥑');
+    }
 };
