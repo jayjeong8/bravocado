@@ -14,8 +14,8 @@ const app = new App({
     receiver: receiver,
 });
 
-// 🥑 아보카도 감지 로직
-app.message(/🥑/, async ({ message, say }) => {
+// 아보카도 감지
+app.message(/:avocado:|🥑/, async ({ message, say }) => {
     if (message.subtype || message.bot_id) return; // 봇 무시
 
     const sender = message.user;
@@ -59,8 +59,30 @@ app.command('/leaderboard', async ({ ack, say }) => {
     await say(msg);
 });
 
-// Vercel Entry Point
 module.exports = async (req, res) => {
-    if (req.method === 'POST') await receiver.requestHandler(req, res);
-    else res.status(200).send('Bravocado is running! 🥑');
+    // Body가 문자열인 경우 파싱
+    let body = req.body;
+    if (typeof body === 'string') {
+        try {
+            body = JSON.parse(body);
+            req.body = body;
+        } catch (e) {
+            // JSON 파싱 실패 시 무시
+        }
+    }
+
+    // 슬랙의 URL 검증(Challenge) 요청 처리
+    if (body && body.type === 'url_verification') {
+        return res.status(200).json({ challenge: body.challenge });
+    }
+
+    // POST 요청: Bolt로 처리
+    if (req.method === 'POST') {
+        if (!req.rawBody && req.body) {
+            req.rawBody = Buffer.from(JSON.stringify(req.body));
+        }
+        await receiver.requestHandler(req, res);
+    } else {
+        res.status(200).send('Bravocado is running! 🥑');
+    }
 };
