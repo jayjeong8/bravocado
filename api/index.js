@@ -18,8 +18,8 @@ const app = new App({
     receiver: receiver,
 });
 
-// 🥑 아보카도 감지 로직
-app.message(/🥑/, async ({ message, say }) => {
+// 🥑 아보카도 감지 로직 (:avocado: 텍스트 또는 🥑 이모지 모두 매칭)
+app.message(/:avocado:|🥑/, async ({ message, say }) => {
     if (message.subtype || message.bot_id) return; // 봇 무시
 
     const sender = message.user;
