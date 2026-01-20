@@ -65,13 +65,26 @@ app.command('/leaderboard', async ({ ack, say }) => {
 
 module.exports = async (req, res) => {
     // 디버깅을 위해 로그를 찍어봅니다 (Vercel 로그에서 확인 가능)
-    console.log('Incoming Request Body:', JSON.stringify(req.body));
     console.log('Request Method:', req.method);
+    console.log('Content-Type:', req.headers['content-type']);
+    console.log('Request Body:', req.body);
+    console.log('Request Body Type:', typeof req.body);
+
+    // Body가 문자열인 경우 파싱
+    let body = req.body;
+    if (typeof body === 'string') {
+        try {
+            body = JSON.parse(body);
+            req.body = body;
+        } catch (e) {
+            console.log('Body parse error:', e.message);
+        }
+    }
 
     // 1. 슬랙의 URL 검증(Challenge) 요청을 최우선으로 처리
-    if (req.body && req.body.type === 'url_verification') {
-        console.log('Challenge request received, responding with:', req.body.challenge);
-        return res.status(200).json({ challenge: req.body.challenge });
+    if (body && body.type === 'url_verification') {
+        console.log('Challenge request received, responding with:', body.challenge);
+        return res.status(200).json({ challenge: body.challenge });
     }
 
     // 2. 일반적인 봇 이벤트 처리
