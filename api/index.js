@@ -9,16 +9,12 @@ const receiver = new ExpressReceiver({
     processBeforeResponse: true,
 });
 
-// 👇 이 로그 코드를 추가해서 배포 후 Vercel 로그를 확인하세요.
-console.log('Bot Token Check:', process.env.SLACK_BOT_TOKEN ? 'Exist' : 'Missing');
-console.log('Token starts with:', process.env.SLACK_BOT_TOKEN?.substring(0, 5));
-
 const app = new App({
     token: process.env.SLACK_BOT_TOKEN,
     receiver: receiver,
 });
 
-// 🥑 아보카도 감지 로직 (:avocado: 텍스트 또는 🥑 이모지 모두 매칭)
+// 아보카도 감지
 app.message(/:avocado:|🥑/, async ({ message, say }) => {
     if (message.subtype || message.bot_id) return; // 봇 무시
 
@@ -64,12 +60,6 @@ app.command('/leaderboard', async ({ ack, say }) => {
 });
 
 module.exports = async (req, res) => {
-    // 디버깅을 위해 로그를 찍어봅니다 (Vercel 로그에서 확인 가능)
-    console.log('Request Method:', req.method);
-    console.log('Content-Type:', req.headers['content-type']);
-    console.log('Request Body:', req.body);
-    console.log('Request Body Type:', typeof req.body);
-
     // Body가 문자열인 경우 파싱
     let body = req.body;
     if (typeof body === 'string') {
@@ -77,28 +67,22 @@ module.exports = async (req, res) => {
             body = JSON.parse(body);
             req.body = body;
         } catch (e) {
-            console.log('Body parse error:', e.message);
+            // JSON 파싱 실패 시 무시
         }
     }
 
-    // 1. 슬랙의 URL 검증(Challenge) 요청을 최우선으로 처리
+    // 슬랙의 URL 검증(Challenge) 요청 처리
     if (body && body.type === 'url_verification') {
-        console.log('Challenge request received, responding with:', body.challenge);
         return res.status(200).json({ challenge: body.challenge });
     }
 
-    // 2. 일반적인 봇 이벤트 처리
+    // POST 요청: Bolt로 처리
     if (req.method === 'POST') {
-        // Bolt의 서명 검증을 위해 rawBody 설정
-        // Vercel이 이미 body를 파싱했으므로 rawBody를 다시 만들어줌
         if (!req.rawBody && req.body) {
             req.rawBody = Buffer.from(JSON.stringify(req.body));
         }
-
-        // Bolt가 요청을 처리하도록 넘김
         await receiver.requestHandler(req, res);
     } else {
-        // 3. 브라우저 접속 시 (GET 요청)
         res.status(200).send('Bravocado is running! 🥑');
     }
 };
