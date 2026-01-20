@@ -66,15 +66,22 @@ app.command('/leaderboard', async ({ ack, say }) => {
 module.exports = async (req, res) => {
     // 디버깅을 위해 로그를 찍어봅니다 (Vercel 로그에서 확인 가능)
     console.log('Incoming Request Body:', JSON.stringify(req.body));
+    console.log('Request Method:', req.method);
 
     // 1. 슬랙의 URL 검증(Challenge) 요청을 최우선으로 처리
-    // 이 부분이 없으면 Bolt가 서명 검증을 하다가 실패할 수 있습니다.
     if (req.body && req.body.type === 'url_verification') {
+        console.log('Challenge request received, responding with:', req.body.challenge);
         return res.status(200).json({ challenge: req.body.challenge });
     }
 
     // 2. 일반적인 봇 이벤트 처리
     if (req.method === 'POST') {
+        // Bolt의 서명 검증을 위해 rawBody 설정
+        // Vercel이 이미 body를 파싱했으므로 rawBody를 다시 만들어줌
+        if (!req.rawBody && req.body) {
+            req.rawBody = Buffer.from(JSON.stringify(req.body));
+        }
+
         // Bolt가 요청을 처리하도록 넘김
         await receiver.requestHandler(req, res);
     } else {
