@@ -28,7 +28,7 @@ app.message(/:avocado:|🥑/, async ({ message, say }) => {
         if (receiver === sender) {
             await app.client.chat.postMessage({
                 channel: sender,
-                text: `자기 자신을 으깰 순 없어요! 😅`
+                text: `자신에게는 보낼 수 없어요!`
             });
             continue;
         }
