@@ -26,7 +26,10 @@ app.message(/:avocado:|🥑/, async ({ message, say }) => {
 
     for (const receiver of receiverIds) {
         if (receiver === sender) {
-            await say(`자기 자신을 으깰 순 없어요! 😅 <@${sender}>`);
+            await app.client.chat.postMessage({
+                channel: sender,
+                text: `자기 자신을 으깰 순 없어요! 😅`
+            });
             continue;
         }
 
@@ -35,7 +38,10 @@ app.message(/:avocado:|🥑/, async ({ message, say }) => {
         const limit = user ? user.remaining_daily : 5;
 
         if (limit <= 0) {
-            await say(`오늘 수확한 아보카도가 다 떨어졌어요! 🥑 내일 만나요.`);
+            await app.client.chat.postMessage({
+                channel: sender,
+                text: `오늘 수확한 아보카도가 다 떨어졌어요! 🥑 내일 만나요.`
+            });
             return;
         }
 
@@ -45,7 +51,12 @@ app.message(/:avocado:|🥑/, async ({ message, say }) => {
             message_text: message.text, channel_id_input: message.channel
         });
 
-        if (!error) await say(`Bravocado! 🥑 <@${receiver}>님이 잘 익은 아보카도를 받았어요!`);
+        if (!error) {
+            await app.client.chat.postMessage({
+                channel: sender,
+                text: `Bravocado! 🥑 <@${receiver}>님이 잘 익은 아보카도를 받았어요!`
+            });
+        }
     }
 });
 
