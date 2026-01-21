@@ -46,6 +46,23 @@ function parseAvocadoMessage(message) {
     return { sender, receiverIds, avocadoCount };
 }
 
+// 아보카도 분배 계산 (순수 함수)
+function calculateDistribution(receiverIds, avocadoCount, remaining) {
+    const totalNeeded = avocadoCount * receiverIds.length;
+    const actualTotal = Math.min(totalNeeded, remaining);
+
+    const distribution = [];
+    let remainingToDistribute = actualTotal;
+
+    for (const receiverId of receiverIds) {
+        const countForThis = Math.min(avocadoCount, remainingToDistribute);
+        distribution.push({ receiverId, count: countForThis });
+        remainingToDistribute -= countForThis;
+    }
+
+    return distribution;
+}
+
 // 아보카도 감지
 app.message(/:avocado:|🥑/, async ({ message }) => {
     const parsed = parseAvocadoMessage(message);
@@ -68,23 +85,7 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
         return;
     }
 
-    // 총 필요량 계산 (이모지 개수 × 수신자 수)
-    const totalNeeded = avocadoCount * receiverIds.length;
-    const actualTotal = Math.min(totalNeeded, remaining);
-
-    // 균등 분배 계산 (앞에서부터 순서대로)
-    const distribution = [];
-    let remainingToDistribute = actualTotal;
-
-    for (const receiverId of receiverIds) {
-        const countForThis = Math.min(avocadoCount, remainingToDistribute);
-        if (countForThis > 0) {
-            distribution.push({ receiverId, count: countForThis });
-            remainingToDistribute -= countForThis;
-        } else {
-            distribution.push({ receiverId, count: 0 });
-        }
-    }
+    const distribution = calculateDistribution(receiverIds, avocadoCount, remaining);
 
     // 아보카도 전송
     const successList = [];
