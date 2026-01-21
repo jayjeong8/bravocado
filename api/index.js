@@ -1,6 +1,9 @@
 const { App, ExpressReceiver } = require('@slack/bolt');
 const { createClient } = require('@supabase/supabase-js');
 
+// 상수 정의
+const DEFAULT_DAILY_AVOCADOS = 5;
+
 // 환경 변수 로드
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
@@ -48,7 +51,7 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
 
     // 잔여 개수 확인 (루프 밖에서 한 번만)
     const { data: user } = await supabase.from('profiles').select('remaining_daily').eq('id', sender).single();
-    const remaining = user ? user.remaining_daily : 5;
+    const remaining = user ? user.remaining_daily : DEFAULT_DAILY_AVOCADOS;
 
     if (remaining <= 0) {
         await app.client.chat.postMessage({
