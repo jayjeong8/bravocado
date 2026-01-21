@@ -24,6 +24,11 @@ function countAvocados(text) {
     return emojiMatches.length + slackMatches.length;
 }
 
+// DM 전송 함수
+async function sendDM(userId, text) {
+    return app.client.chat.postMessage({ channel: userId, text });
+}
+
 // 아보카도 감지
 app.message(/:avocado:|🥑/, async ({ message }) => {
     if (message.subtype || message.bot_id) return; // 봇 무시
@@ -42,10 +47,7 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
 
     // 자기 자신에게만 보낸 경우
     if (receiverIds.length === 0) {
-        await app.client.chat.postMessage({
-            channel: sender,
-            text: `자신에게는 보낼 수 없어요!`
-        });
+        await sendDM(sender, `자신에게는 보낼 수 없어요!`);
         return;
     }
 
@@ -54,10 +56,7 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
     const remaining = user ? user.remaining_daily : DEFAULT_DAILY_AVOCADOS;
 
     if (remaining <= 0) {
-        await app.client.chat.postMessage({
-            channel: sender,
-            text: `오늘 수확한 아보카도가 다 떨어졌어요! 🥑 내일 만나요.`
-        });
+        await sendDM(sender, `오늘 수확한 아보카도가 다 떨어졌어요! 🥑 내일 만나요.`);
         return;
     }
 
@@ -100,10 +99,7 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
         if (!error) {
             successList.push({ receiverId, count });
             // 수신자에게 DM 알림
-            await app.client.chat.postMessage({
-                channel: receiverId,
-                text: `<@${sender}>님이 아보카도 ${count}개를 보냈어요! 🥑\n💬 ${message.text}`
-            });
+            await sendDM(receiverId, `<@${sender}>님이 아보카도 ${count}개를 보냈어요! 🥑\n💬 ${message.text}`);
         } else {
             failedList.push(receiverId);
         }
@@ -139,10 +135,7 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
             ? `오늘 남은 아보카도: ${remainingAfter}개`
             : `오늘 아보카도를 모두 나눠줬어요! 내일 또 만나요.`;
 
-        await app.client.chat.postMessage({
-            channel: sender,
-            text: `${resultMessage}\n${remainingText}`
-        });
+        await sendDM(sender, `${resultMessage}\n${remainingText}`);
     }
 });
 
