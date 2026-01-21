@@ -29,21 +29,29 @@ async function sendDM(userId, text) {
     return app.client.chat.postMessage({ channel: userId, text });
 }
 
-// 아보카도 감지
-app.message(/:avocado:|🥑/, async ({ message }) => {
-    if (message.subtype || message.bot_id) return; // 봇 무시
+// 메시지 파싱 함수
+function parseAvocadoMessage(message) {
+    if (message.subtype || message.bot_id) return null;
 
     const sender = message.user;
-    const matches = message.text.match(/<@([A-Z0-9]+)>/g); // 멘션 추출
-    if (!matches) return;
+    const matches = message.text.match(/<@([A-Z0-9]+)>/g);
+    if (!matches) return null;
 
-    // 아보카도 개수 카운트
     const avocadoCount = countAvocados(message.text);
-    if (avocadoCount === 0) return;
+    if (avocadoCount === 0) return null;
 
-    // 자기 자신 제외한 수신자 목록
     const receiverIds = [...new Set(matches.map(m => m.replace(/[<@>]/g, '')))]
         .filter(id => id !== sender);
+
+    return { sender, receiverIds, avocadoCount };
+}
+
+// 아보카도 감지
+app.message(/:avocado:|🥑/, async ({ message }) => {
+    const parsed = parseAvocadoMessage(message);
+    if (!parsed) return;
+
+    const { sender, receiverIds, avocadoCount } = parsed;
 
     // 자기 자신에게만 보낸 경우
     if (receiverIds.length === 0) {
