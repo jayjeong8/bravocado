@@ -124,9 +124,21 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
     }
 
     if (resultMessage) {
+        // 남은 아보카도 개수 조회
+        const { data: updatedUser } = await supabase
+            .from('profiles')
+            .select('remaining_daily')
+            .eq('id', sender)
+            .single();
+        const remainingAfter = updatedUser ? updatedUser.remaining_daily : 0;
+
+        const remainingText = remainingAfter > 0
+            ? `오늘 남은 아보카도: ${remainingAfter}개`
+            : `오늘 아보카도를 모두 나눠줬어요! 내일 또 만나요.`;
+
         await app.client.chat.postMessage({
             channel: sender,
-            text: resultMessage
+            text: `${resultMessage}\n${remainingText}`
         });
     }
 });
