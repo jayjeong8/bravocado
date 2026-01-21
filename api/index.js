@@ -90,6 +90,36 @@ function buildResultMessage(successList, failedList, remainingAfter) {
     return `${resultMessage}\n${remainingText}`;
 }
 
+// 아보카도 전송 처리 (DB 저장 + 수신자 DM)
+async function processAvocadoTransfers(distribution, sender, message) {
+    const successList = [];
+    const failedList = [];
+
+    for (const { receiverId, count } of distribution) {
+        if (count === 0) {
+            failedList.push(receiverId);
+            continue;
+        }
+
+        const { error } = await supabase.rpc('give_avocado', {
+            sender_id_input: sender,
+            receiver_id_input: receiverId,
+            count: count,
+            message_text: message.text,
+            channel_id_input: message.channel
+        });
+
+        if (!error) {
+            successList.push({ receiverId, count });
+            await sendDM(receiverId, `<@${sender}>님이 아보카도 ${count}개를 보냈어요! 🥑\n💬 ${message.text}`);
+        } else {
+            failedList.push(receiverId);
+        }
+    }
+
+    return { successList, failedList };
+}
+
 // 아보카도 감지
 app.message(/:avocado:|🥑/, async ({ message }) => {
     const parsed = parseAvocadoMessage(message);
@@ -113,33 +143,7 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
     }
 
     const distribution = calculateDistribution(receiverIds, avocadoCount, remaining);
-
-    // 아보카도 전송
-    const successList = [];
-    const failedList = [];
-
-    for (const { receiverId, count } of distribution) {
-        if (count === 0) {
-            failedList.push(receiverId);
-            continue;
-        }
-
-        const { error } = await supabase.rpc('give_avocado', {
-            sender_id_input: sender,
-            receiver_id_input: receiverId,
-            count: count,
-            message_text: message.text,
-            channel_id_input: message.channel
-        });
-
-        if (!error) {
-            successList.push({ receiverId, count });
-            // 수신자에게 DM 알림
-            await sendDM(receiverId, `<@${sender}>님이 아보카도 ${count}개를 보냈어요! 🥑\n💬 ${message.text}`);
-        } else {
-            failedList.push(receiverId);
-        }
-    }
+    const { successList, failedList } = await processAvocadoTransfers(distribution, sender, message);
 
     // 결과 DM 전송
     if (successList.length > 0 || failedList.length > 0) {
