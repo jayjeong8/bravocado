@@ -96,6 +96,11 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
 
         if (!error) {
             successList.push({ receiverId, count });
+            // 수신자에게 DM 알림
+            await app.client.chat.postMessage({
+                channel: receiverId,
+                text: `<@${sender}>님이 아보카도 ${count}개를 보냈어요! 🥑\n💬 ${message.text}`
+            });
         } else {
             failedList.push(receiverId);
         }
