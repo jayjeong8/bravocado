@@ -63,6 +63,33 @@ function calculateDistribution(receiverIds, avocadoCount, remaining) {
     return distribution;
 }
 
+// 결과 메시지 생성 (순수 함수)
+function buildResultMessage(successList, failedList, remainingAfter) {
+    let resultMessage = '';
+
+    if (successList.length > 0) {
+        resultMessage = `Bravocado! 🥑 아보카도를 보냈어요!\n`;
+        for (const { receiverId, count } of successList) {
+            resultMessage += `<@${receiverId}>님에게 ${count}개\n`;
+        }
+    }
+
+    if (failedList.length > 0) {
+        if (resultMessage) resultMessage += '\n';
+        resultMessage += `오늘 아보카도를 다 써서 `;
+        resultMessage += failedList.map(id => `<@${id}>`).join(', ');
+        resultMessage += `님에게는 보내지 못했어요.`;
+    }
+
+    if (!resultMessage) return null;
+
+    const remainingText = remainingAfter > 0
+        ? `오늘 남은 아보카도: ${remainingAfter}개`
+        : `오늘 아보카도를 모두 나눠줬어요! 내일 또 만나요.`;
+
+    return `${resultMessage}\n${remainingText}`;
+}
+
 // 아보카도 감지
 app.message(/:avocado:|🥑/, async ({ message }) => {
     const parsed = parseAvocadoMessage(message);
@@ -114,25 +141,8 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
         }
     }
 
-    // 결과 DM 메시지 생성
-    let resultMessage = '';
-
-    if (successList.length > 0) {
-        resultMessage = `Bravocado! 🥑 아보카도를 보냈어요!\n`;
-        for (const { receiverId, count } of successList) {
-            resultMessage += `<@${receiverId}>님에게 ${count}개\n`;
-        }
-    }
-
-    if (failedList.length > 0) {
-        if (resultMessage) resultMessage += '\n';
-        resultMessage += `오늘 아보카도를 다 써서 `;
-        resultMessage += failedList.map(id => `<@${id}>`).join(', ');
-        resultMessage += `님에게는 보내지 못했어요.`;
-    }
-
-    if (resultMessage) {
-        // 남은 아보카도 개수 조회
+    // 결과 DM 전송
+    if (successList.length > 0 || failedList.length > 0) {
         const { data: updatedUser } = await supabase
             .from('profiles')
             .select('remaining_daily')
@@ -140,11 +150,10 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
             .single();
         const remainingAfter = updatedUser ? updatedUser.remaining_daily : 0;
 
-        const remainingText = remainingAfter > 0
-            ? `오늘 남은 아보카도: ${remainingAfter}개`
-            : `오늘 아보카도를 모두 나눠줬어요! 내일 또 만나요.`;
-
-        await sendDM(sender, `${resultMessage}\n${remainingText}`);
+        const resultMessage = buildResultMessage(successList, failedList, remainingAfter);
+        if (resultMessage) {
+            await sendDM(sender, resultMessage);
+        }
     }
 });
 
