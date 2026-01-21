@@ -14,49 +14,115 @@ const app = new App({
     receiver: receiver,
 });
 
+// 아보카도 이모지 카운트 함수
+function countAvocados(text) {
+    const emojiMatches = text.match(/🥑/g) || [];
+    const slackMatches = text.match(/:avocado:/g) || [];
+    return emojiMatches.length + slackMatches.length;
+}
+
 // 아보카도 감지
-app.message(/:avocado:|🥑/, async ({ message, say }) => {
+app.message(/:avocado:|🥑/, async ({ message }) => {
     if (message.subtype || message.bot_id) return; // 봇 무시
 
     const sender = message.user;
     const matches = message.text.match(/<@([A-Z0-9]+)>/g); // 멘션 추출
     if (!matches) return;
 
-    const receiverIds = [...new Set(matches.map(m => m.replace(/[<@>]/g, '')))];
+    // 아보카도 개수 카운트
+    const avocadoCount = countAvocados(message.text);
+    if (avocadoCount === 0) return;
 
-    for (const receiver of receiverIds) {
-        if (receiver === sender) {
-            await app.client.chat.postMessage({
-                channel: sender,
-                text: `자신에게는 보낼 수 없어요!`
-            });
+    // 자기 자신 제외한 수신자 목록
+    const receiverIds = [...new Set(matches.map(m => m.replace(/[<@>]/g, '')))]
+        .filter(id => id !== sender);
+
+    // 자기 자신에게만 보낸 경우
+    if (receiverIds.length === 0) {
+        await app.client.chat.postMessage({
+            channel: sender,
+            text: `자신에게는 보낼 수 없어요!`
+        });
+        return;
+    }
+
+    // 잔여 개수 확인 (루프 밖에서 한 번만)
+    const { data: user } = await supabase.from('profiles').select('remaining_daily').eq('id', sender).single();
+    const remaining = user ? user.remaining_daily : 5;
+
+    if (remaining <= 0) {
+        await app.client.chat.postMessage({
+            channel: sender,
+            text: `오늘 수확한 아보카도가 다 떨어졌어요! 🥑 내일 만나요.`
+        });
+        return;
+    }
+
+    // 총 필요량 계산 (이모지 개수 × 수신자 수)
+    const totalNeeded = avocadoCount * receiverIds.length;
+    const actualTotal = Math.min(totalNeeded, remaining);
+
+    // 균등 분배 계산 (앞에서부터 순서대로)
+    const distribution = [];
+    let remainingToDistribute = actualTotal;
+
+    for (const receiverId of receiverIds) {
+        const countForThis = Math.min(avocadoCount, remainingToDistribute);
+        if (countForThis > 0) {
+            distribution.push({ receiverId, count: countForThis });
+            remainingToDistribute -= countForThis;
+        } else {
+            distribution.push({ receiverId, count: 0 });
+        }
+    }
+
+    // 아보카도 전송
+    const successList = [];
+    const failedList = [];
+
+    for (const { receiverId, count } of distribution) {
+        if (count === 0) {
+            failedList.push(receiverId);
             continue;
         }
 
-        // 1. 잔여 개수 확인
-        const { data: user } = await supabase.from('profiles').select('remaining_daily').eq('id', sender).single();
-        const limit = user ? user.remaining_daily : 5;
-
-        if (limit <= 0) {
-            await app.client.chat.postMessage({
-                channel: sender,
-                text: `오늘 수확한 아보카도가 다 떨어졌어요! 🥑 내일 만나요.`
-            });
-            return;
-        }
-
-        // 2. 아보카도 전송 (DB 함수 호출)
         const { error } = await supabase.rpc('give_avocado', {
-            sender_id_input: sender, receiver_id_input: receiver, count: 1,
-            message_text: message.text, channel_id_input: message.channel
+            sender_id_input: sender,
+            receiver_id_input: receiverId,
+            count: count,
+            message_text: message.text,
+            channel_id_input: message.channel
         });
 
         if (!error) {
-            await app.client.chat.postMessage({
-                channel: sender,
-                text: `Bravocado! 🥑 <@${receiver}>님이 잘 익은 아보카도를 받았어요!`
-            });
+            successList.push({ receiverId, count });
+        } else {
+            failedList.push(receiverId);
         }
+    }
+
+    // 결과 DM 메시지 생성
+    let resultMessage = '';
+
+    if (successList.length > 0) {
+        resultMessage = `Bravocado! 🥑 아보카도를 보냈어요!\n`;
+        for (const { receiverId, count } of successList) {
+            resultMessage += `<@${receiverId}>님에게 ${count}개\n`;
+        }
+    }
+
+    if (failedList.length > 0) {
+        if (resultMessage) resultMessage += '\n';
+        resultMessage += `오늘 아보카도를 다 써서 `;
+        resultMessage += failedList.map(id => `<@${id}>`).join(', ');
+        resultMessage += `님에게는 보내지 못했어요.`;
+    }
+
+    if (resultMessage) {
+        await app.client.chat.postMessage({
+            channel: sender,
+            text: resultMessage
+        });
     }
 });
 
