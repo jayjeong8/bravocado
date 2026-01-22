@@ -1,6 +1,9 @@
 const { App, ExpressReceiver } = require('@slack/bolt');
 const { createClient } = require('@supabase/supabase-js');
 
+// 상수 정의
+const DEFAULT_DAILY_AVOCADOS = 5;
+
 // 환경 변수 로드
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
@@ -14,49 +17,158 @@ const app = new App({
     receiver: receiver,
 });
 
-// 아보카도 감지
-app.message(/:avocado:|🥑/, async ({ message, say }) => {
-    if (message.subtype || message.bot_id) return; // 봇 무시
+// 아보카도 이모지 카운트 함수
+function countAvocados(text) {
+    const emojiMatches = text.match(/🥑/g) || [];
+    const slackMatches = text.match(/:avocado:/g) || [];
+    return emojiMatches.length + slackMatches.length;
+}
+
+// DM 전송 함수
+async function sendDM(userId, text) {
+    return app.client.chat.postMessage({ channel: userId, text });
+}
+
+// 메시지 파싱 함수
+function parseAvocadoMessage(message) {
+    if (message.subtype || message.bot_id) return null;
 
     const sender = message.user;
-    const matches = message.text.match(/<@([A-Z0-9]+)>/g); // 멘션 추출
-    if (!matches) return;
+    const matches = message.text.match(/<@([A-Z0-9]+)>/g);
+    if (!matches) return null;
 
-    const receiverIds = [...new Set(matches.map(m => m.replace(/[<@>]/g, '')))];
+    const avocadoCount = countAvocados(message.text);
+    if (avocadoCount === 0) return null;
 
-    for (const receiver of receiverIds) {
-        if (receiver === sender) {
-            await say(`자기 자신을 으깰 순 없어요! 😅 <@${sender}>`);
+    const receiverIds = [...new Set(matches.map(m => m.replace(/[<@>]/g, '')))]
+        .filter(id => id !== sender);
+
+    return { sender, receiverIds, avocadoCount };
+}
+
+// 아보카도 분배 계산 (순수 함수)
+function calculateDistribution(receiverIds, avocadoCount, remaining) {
+    const totalNeeded = avocadoCount * receiverIds.length;
+    const actualTotal = Math.min(totalNeeded, remaining);
+
+    const distribution = [];
+    let remainingToDistribute = actualTotal;
+
+    for (const receiverId of receiverIds) {
+        const countForThis = Math.min(avocadoCount, remainingToDistribute);
+        distribution.push({ receiverId, count: countForThis });
+        remainingToDistribute -= countForThis;
+    }
+
+    return distribution;
+}
+
+// 결과 메시지 생성 (순수 함수)
+function buildResultMessage(successList, failedList, remainingAfter) {
+    let resultMessage = '';
+
+    if (successList.length > 0) {
+        resultMessage = `Bravocado! 🥑 아보카도를 보냈어요!\n`;
+        for (const { receiverId, count } of successList) {
+            resultMessage += `<@${receiverId}>님에게 ${count}개\n`;
+        }
+    }
+
+    if (failedList.length > 0) {
+        if (resultMessage) resultMessage += '\n';
+        resultMessage += `오늘 아보카도를 다 써서 `;
+        resultMessage += failedList.map(id => `<@${id}>`).join(', ');
+        resultMessage += `님에게는 보내지 못했어요.`;
+    }
+
+    if (!resultMessage) return null;
+
+    const remainingText = remainingAfter > 0
+        ? `오늘 남은 아보카도: ${remainingAfter}개`
+        : `오늘 아보카도를 모두 나눠줬어요! 내일 또 만나요.`;
+
+    return `${resultMessage}\n${remainingText}`;
+}
+
+// 아보카도 전송 처리 (DB 저장 + 수신자 DM)
+async function processAvocadoTransfers(distribution, sender, message) {
+    const successList = [];
+    const failedList = [];
+
+    for (const { receiverId, count } of distribution) {
+        if (count === 0) {
+            failedList.push(receiverId);
             continue;
         }
 
-        // 1. 잔여 개수 확인
-        const { data: user } = await supabase.from('profiles').select('remaining_daily').eq('id', sender).single();
-        const limit = user ? user.remaining_daily : 5;
-
-        if (limit <= 0) {
-            await say(`오늘 수확한 아보카도가 다 떨어졌어요! 🥑 내일 만나요.`);
-            return;
-        }
-
-        // 2. 아보카도 전송 (DB 함수 호출)
         const { error } = await supabase.rpc('give_avocado', {
-            sender_id_input: sender, receiver_id_input: receiver, count: 1,
-            message_text: message.text, channel_id_input: message.channel
+            sender_id_input: sender,
+            receiver_id_input: receiverId,
+            count: count,
+            message_text: message.text,
+            channel_id_input: message.channel
         });
 
-        if (!error) await say(`Bravocado! 🥑 <@${receiver}>님이 잘 익은 아보카도를 받았어요!`);
+        if (!error) {
+            successList.push({ receiverId, count });
+            await sendDM(receiverId, `<@${sender}>님이 아보카도 ${count}개를 보냈어요! 🥑\n💬 ${message.text}`);
+        } else {
+            failedList.push(receiverId);
+        }
+    }
+
+    return { successList, failedList };
+}
+
+// 아보카도 감지
+app.message(/:avocado:|🥑/, async ({ message }) => {
+    const parsed = parseAvocadoMessage(message);
+    if (!parsed) return;
+
+    const { sender, receiverIds, avocadoCount } = parsed;
+
+    // 자기 자신에게만 보낸 경우
+    if (receiverIds.length === 0) {
+        await sendDM(sender, `자신에게는 보낼 수 없어요!`);
+        return;
+    }
+
+    // 잔여 개수 확인 (루프 밖에서 한 번만)
+    const { data: user } = await supabase.from('profiles').select('remaining_daily').eq('id', sender).single();
+    const remaining = user ? user.remaining_daily : DEFAULT_DAILY_AVOCADOS;
+
+    if (remaining <= 0) {
+        await sendDM(sender, `오늘 수확한 아보카도가 다 떨어졌어요! 🥑 내일 만나요.`);
+        return;
+    }
+
+    const distribution = calculateDistribution(receiverIds, avocadoCount, remaining);
+    const { successList, failedList } = await processAvocadoTransfers(distribution, sender, message);
+
+    // 결과 DM 전송
+    if (successList.length > 0 || failedList.length > 0) {
+        const { data: updatedUser } = await supabase
+            .from('profiles')
+            .select('remaining_daily')
+            .eq('id', sender)
+            .single();
+        const remainingAfter = updatedUser ? updatedUser.remaining_daily : 0;
+
+        const resultMessage = buildResultMessage(successList, failedList, remainingAfter);
+        if (resultMessage) {
+            await sendDM(sender, resultMessage);
+        }
     }
 });
 
 // 🏆 리더보드
-app.command('/leaderboard', async ({ ack, say }) => {
+app.command('/avo-leaderboard', async ({ ack, respond }) => {
     await ack();
     const { data: leaders } = await supabase.from('profiles').select('id, received_count').order('received_count', { ascending: false }).limit(5);
 
     let msg = "*🏆 명예의 전당*\n";
     leaders?.forEach((u, i) => msg += `${i+1}위 <@${u.id}>: ${u.received_count} 🥑\n`);
-    await say(msg);
+    await respond(msg);
 });
 
 module.exports = async (req, res) => {
