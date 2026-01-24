@@ -227,15 +227,15 @@ app.event('app_home_opened', async ({ event, client }) => {
                 { type: 'divider' },
                 {
                     type: 'header',
-                    text: { type: 'plain_text', text: 'Top Avos 🏆', emoji: true },
+                    text: { type: 'plain_text', text: 'Top Avo Givers 🫴', emoji: true },
                 },
-                ...leaderboardBlocks,
+                ...giversBlocks,
                 { type: 'divider' },
                 {
                     type: 'header',
-                    text: { type: 'plain_text', text: 'Top Givers 🫴', emoji: true },
+                    text: { type: 'plain_text', text: 'Top Avo Receivers 🏆', emoji: true },
                 },
-                ...giversBlocks,
+                ...leaderboardBlocks,
                 { type: 'divider' },
                 {
                     type: 'context',
