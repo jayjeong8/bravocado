@@ -137,7 +137,11 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
     if (!canDistribute(receiverIds, avocadoCount, remaining)) {
         const totalNeeded = avocadoCount * receiverIds.length;
         const plural = remaining !== 1 ? 's' : '';
-        await sendDM(sender, `You tried to give *${totalNeeded} avo${totalNeeded > 1 ? 's' : ''}* to ${receiverIds.length} people, but you only have *${remaining} avo${plural}* left. No avos were sent. You have *${remaining} avo${plural}* left to give out today.`);
+        await app.client.chat.postEphemeral({
+            channel: message.channel,
+            user: sender,
+            text: `You tried to give *${totalNeeded} avo${totalNeeded > 1 ? 's' : ''}* to ${receiverIds.length} people, but you only have *${remaining} avo${plural}* left. No avos were sent. You have *${remaining} avo${plural}* left to give out today.`
+        });
         return;
     }
 
