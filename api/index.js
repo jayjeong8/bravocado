@@ -119,7 +119,7 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
 
     // 자기 자신에게만 보낸 경우
     if (receiverIds.length === 0) {
-        await sendDM(sender, `자신에게는 보낼 수 없어요!`);
+        await sendDM(sender, `We love self-care, but avocados are for sharing! 🥑 You can't give them to yourself.`);
         return;
     }
 
@@ -128,7 +128,7 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
     const remaining = user ? user.remaining_daily : DEFAULT_DAILY_AVOCADOS;
 
     if (remaining <= 0) {
-        await sendDM(sender, `오늘 수확한 아보카도가 다 떨어졌어요! 🥑 내일 만나요.`);
+        await sendDM(sender, `You're too generous! You've used up your daily supply. You have 0 🥑s left. Come back tomorrow to spread more love. 💚`);
         return;
     }
 
