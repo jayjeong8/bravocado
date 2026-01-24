@@ -2,6 +2,15 @@
   "functions": {
     "api/index.js": {
       "maxDuration": 10
+    },
+    "api/weekly-report.js": {
+      "maxDuration": 60
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/weekly-report",
+      "schedule": "0 0 * * 1"
+    }
+  ]
 }
