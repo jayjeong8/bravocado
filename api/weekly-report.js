@@ -36,8 +36,7 @@ function aggregateWeeklyStats(transactions) {
 
 function buildRankingList(items) {
     return items.map((item, i) => {
-        const plural = item.total !== 1 ? 's' : '';
-        return `${i + 1}. <@${item.id}> - ${item.total} avo${plural}`;
+        return `${i + 1}. <@${item.id}>  *${item.total}*`;
     }).join('\n');
 }
 
