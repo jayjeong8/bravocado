@@ -71,7 +71,7 @@ function buildResultMessage(successList, failedList, remainingAfter, selfInclude
     const remainPlural = remainingAfter !== 1 ? 's' : '';
     const recipientList = formatRecipientList(successList.map(s => s.receiverId));
 
-    let msg = `${recipientList} received ${avocadoCount} 🥑${countPlural} from you. You have ${remainingAfter} 🥑${remainPlural} left to give out today.`;
+    let msg = `${recipientList} received *${avocadoCount} avo${countPlural}* from you. You have *${remainingAfter} avo${remainPlural}* left to give out today.`;
 
     if (selfIncluded) {
         msg += `\n(I skipped you, because you can't give avocados to yourself!)`;
@@ -101,7 +101,7 @@ async function processAvocadoTransfers(distribution, sender, message) {
 
         if (!error) {
             successList.push({ receiverId, count });
-            await sendDM(receiverId, `You received ${count} 🥑${count > 1 ? 's' : ''} from <@${sender}> in <#${message.channel}>.\n💬 ${message.text}`);
+            await sendDM(receiverId, `You received *${count} avo${count > 1 ? 's' : ''}* from <@${sender}> in <#${message.channel}>.\n💬 ${message.text}`);
         } else {
             failedList.push(receiverId);
         }
@@ -128,7 +128,7 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
     const remaining = user ? user.remaining_daily : DEFAULT_DAILY_AVOCADOS;
 
     if (remaining <= 0) {
-        await sendDM(sender, `You're too generous! You've used up your daily supply. You have 0 🥑s left. Come back tomorrow to spread more love. 💚`);
+        await sendDM(sender, `You're too generous! You've used up your daily supply. You have *0 avos* left. Come back tomorrow to spread more love. 💚`);
         return;
     }
 
@@ -136,7 +136,7 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
     if (!canDistribute(receiverIds, avocadoCount, remaining)) {
         const totalNeeded = avocadoCount * receiverIds.length;
         const plural = remaining !== 1 ? 's' : '';
-        await sendDM(sender, `You tried to give ${totalNeeded} 🥑${totalNeeded > 1 ? 's' : ''} to ${receiverIds.length} people, but you only have ${remaining} 🥑${plural} left. No avocados were sent. You have ${remaining} 🥑${plural} left to give out today.`);
+        await sendDM(sender, `You tried to give *${totalNeeded} avo${totalNeeded > 1 ? 's' : ''}* to ${receiverIds.length} people, but you only have *${remaining} avo${plural}* left. No avocados were sent. You have *${remaining} avo${plural}* left to give out today.`);
         return;
     }
 
