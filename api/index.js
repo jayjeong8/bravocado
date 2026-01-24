@@ -125,7 +125,11 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
     const remaining = user ? user.remaining_daily : DEFAULT_DAILY_AVOCADOS;
 
     if (remaining <= 0) {
-        await sendDM(sender, `You're too generous! You've used up your daily supply. You have *0 avos* left. Come back tomorrow to spread more love. 💚`);
+        await app.client.chat.postEphemeral({
+            channel: message.channel,
+            user: sender,
+            text: `You're too generous! You've used up your daily supply. You have *0 avos* left. Come back tomorrow to spread more love. 💚`
+        });
         return;
     }
 
