@@ -40,54 +40,41 @@ function parseAvocadoMessage(message) {
     const avocadoCount = countAvocados(message.text);
     if (avocadoCount === 0) return null;
 
-    const receiverIds = [...new Set(matches.map(m => m.replace(/[<@>]/g, '')))]
-        .filter(id => id !== sender);
+    const allReceiverIds = [...new Set(matches.map(m => m.replace(/[<@>]/g, '')))];
+    const selfIncluded = allReceiverIds.includes(sender);
+    const receiverIds = allReceiverIds.filter(id => id !== sender);
 
-    return { sender, receiverIds, avocadoCount };
+    return { sender, receiverIds, avocadoCount, selfIncluded };
 }
 
-// 아보카도 분배 계산 (순수 함수)
-function calculateDistribution(receiverIds, avocadoCount, remaining) {
+// 아보카도 분배 가능 여부 확인 (all-or-nothing)
+function canDistribute(receiverIds, avocadoCount, remaining) {
     const totalNeeded = avocadoCount * receiverIds.length;
-    const actualTotal = Math.min(totalNeeded, remaining);
+    return totalNeeded <= remaining;
+}
 
-    const distribution = [];
-    let remainingToDistribute = actualTotal;
-
-    for (const receiverId of receiverIds) {
-        const countForThis = Math.min(avocadoCount, remainingToDistribute);
-        distribution.push({ receiverId, count: countForThis });
-        remainingToDistribute -= countForThis;
-    }
-
-    return distribution;
+// 수신자 목록 포맷팅 (Oxford comma)
+function formatRecipientList(receiverIds) {
+    const formatter = new Intl.ListFormat('en', { style: 'long', type: 'conjunction' });
+    return formatter.format(receiverIds.map(id => `<@${id}>`));
 }
 
 // 결과 메시지 생성 (순수 함수)
-function buildResultMessage(successList, failedList, remainingAfter) {
-    let resultMessage = '';
+function buildResultMessage(successList, failedList, remainingAfter, selfIncluded) {
+    if (successList.length === 0) return null;
 
-    if (successList.length > 0) {
-        resultMessage = `Bravocado! 🥑 아보카도를 보냈어요!\n`;
-        for (const { receiverId, count } of successList) {
-            resultMessage += `<@${receiverId}>님에게 ${count}개\n`;
-        }
+    const avocadoCount = successList[0].count;
+    const countPlural = avocadoCount > 1 ? 's' : '';
+    const remainPlural = remainingAfter !== 1 ? 's' : '';
+    const recipientList = formatRecipientList(successList.map(s => s.receiverId));
+
+    let msg = `${recipientList} received *${avocadoCount} avo${countPlural}* from you. You have *${remainingAfter} avo${remainPlural}* left to give out today.`;
+
+    if (selfIncluded) {
+        msg += `\n(I skipped you, because you can't give avos to yourself!)`;
     }
 
-    if (failedList.length > 0) {
-        if (resultMessage) resultMessage += '\n';
-        resultMessage += `오늘 아보카도를 다 써서 `;
-        resultMessage += failedList.map(id => `<@${id}>`).join(', ');
-        resultMessage += `님에게는 보내지 못했어요.`;
-    }
-
-    if (!resultMessage) return null;
-
-    const remainingText = remainingAfter > 0
-        ? `오늘 남은 아보카도: ${remainingAfter}개`
-        : `오늘 아보카도를 모두 나눠줬어요! 내일 또 만나요.`;
-
-    return `${resultMessage}\n${remainingText}`;
+    return msg;
 }
 
 // 아보카도 전송 처리 (DB 저장 + 수신자 DM)
@@ -111,7 +98,7 @@ async function processAvocadoTransfers(distribution, sender, message) {
 
         if (!error) {
             successList.push({ receiverId, count });
-            await sendDM(receiverId, `<@${sender}>님이 아보카도 ${count}개를 보냈어요! 🥑\n💬 ${message.text}`);
+            await sendDM(receiverId, `You received *${count} avo${count > 1 ? 's' : ''}* from <@${sender}> in <#${message.channel}>.\n> ${message.text}`);
         } else {
             failedList.push(receiverId);
         }
@@ -125,28 +112,36 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
     const parsed = parseAvocadoMessage(message);
     if (!parsed) return;
 
-    const { sender, receiverIds, avocadoCount } = parsed;
+    const { sender, receiverIds, avocadoCount, selfIncluded } = parsed;
 
     // 자기 자신에게만 보낸 경우
     if (receiverIds.length === 0) {
-        await sendDM(sender, `자신에게는 보낼 수 없어요!`);
+        await sendDM(sender, `We love self-care, but avos are for sharing! 🥑 You can't give them to yourself.`);
         return;
     }
 
-    // 잔여 개수 확인 (루프 밖에서 한 번만)
+    // 잔여 개수 확인
     const { data: user } = await supabase.from('profiles').select('remaining_daily').eq('id', sender).single();
     const remaining = user ? user.remaining_daily : DEFAULT_DAILY_AVOCADOS;
 
     if (remaining <= 0) {
-        await sendDM(sender, `오늘 수확한 아보카도가 다 떨어졌어요! 🥑 내일 만나요.`);
+        await sendDM(sender, `You're too generous! You've used up your daily supply. You have *0 avos* left. Come back tomorrow to spread more love. 💚`);
         return;
     }
 
-    const distribution = calculateDistribution(receiverIds, avocadoCount, remaining);
+    // All-or-nothing: 부족하면 아무에게도 보내지 않음
+    if (!canDistribute(receiverIds, avocadoCount, remaining)) {
+        const totalNeeded = avocadoCount * receiverIds.length;
+        const plural = remaining !== 1 ? 's' : '';
+        await sendDM(sender, `You tried to give *${totalNeeded} avo${totalNeeded > 1 ? 's' : ''}* to ${receiverIds.length} people, but you only have *${remaining} avo${plural}* left. No avos were sent. You have *${remaining} avo${plural}* left to give out today.`);
+        return;
+    }
+
+    const distribution = receiverIds.map(id => ({ receiverId: id, count: avocadoCount }));
     const { successList, failedList } = await processAvocadoTransfers(distribution, sender, message);
 
     // 결과 DM 전송
-    if (successList.length > 0 || failedList.length > 0) {
+    if (successList.length > 0) {
         const { data: updatedUser } = await supabase
             .from('profiles')
             .select('remaining_daily')
@@ -154,7 +149,7 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
             .single();
         const remainingAfter = updatedUser ? updatedUser.remaining_daily : 0;
 
-        const resultMessage = buildResultMessage(successList, failedList, remainingAfter);
+        const resultMessage = buildResultMessage(successList, failedList, remainingAfter, selfIncluded);
         if (resultMessage) {
             await sendDM(sender, resultMessage);
         }
