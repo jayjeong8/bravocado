@@ -227,25 +227,25 @@ app.event('app_home_opened', async ({ event, client }) => {
             blocks: [
                 {
                     type: 'header',
-                    text: { type: 'plain_text', text: 'My Avo Stats', emoji: true },
+                    text: { type: 'plain_text', text: '🥑 My Avo Stats', emoji: true },
                 },
                 {
                     type: 'section',
                     text: {
                         type: 'mrkdwn',
-                        text: `🫴 Given: *${given}* · ${giverTitle}\n🧺 Received: *${received}* · ${receiverTitle}\nAvos left to give today: *${remaining}*`,
+                        text: `Given: *${given}* · ${giverTitle}\nReceived: *${received}* · ${receiverTitle}\nAvos left to give today: *${remaining}*`,
                     },
                 },
                 { type: 'divider' },
                 {
                     type: 'header',
-                    text: { type: 'plain_text', text: 'Top Avo Givers', emoji: true },
+                    text: { type: 'plain_text', text: '🫴 Top Avo Givers', emoji: true },
                 },
                 ...giversBlocks,
                 { type: 'divider' },
                 {
                     type: 'header',
-                    text: { type: 'plain_text', text: 'Top Avo Receivers', emoji: true },
+                    text: { type: 'plain_text', text: '🧺 Top Avo Receivers', emoji: true },
                 },
                 ...leaderboardBlocks,
                 { type: 'divider' },
