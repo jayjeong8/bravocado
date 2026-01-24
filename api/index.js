@@ -156,14 +156,118 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
     }
 });
 
-// 🏆 리더보드
-app.command('/avo-leaderboard', async ({ ack, respond }) => {
-    await ack();
-    const { data: leaders } = await supabase.from('profiles').select('id, received_count').order('received_count', { ascending: false }).limit(5);
+// 칭호 계산 (받은 사람)
+function getTitle(receivedCount) {
+    if (receivedCount >= 500) return 'Holy Guacamole 👑';
+    if (receivedCount >= 250) return 'Certified Fresh ✨';
+    if (receivedCount >= 100) return 'Big Avo Energy 🌳';
+    if (receivedCount >= 50) return 'Warming Up ☀️';
+    if (receivedCount >= 10) return 'Just Watered 💧';
+    return 'Seed Mode 🌱';
+}
 
-    let msg = "*🏆 명예의 전당*\n";
-    leaders?.forEach((u, i) => msg += `${i+1}위 <@${u.id}>: ${u.received_count} 🥑\n`);
-    await respond(msg);
+// 칭호 계산 (준 사람)
+function getGiverTitle(givenCount) {
+    if (givenCount >= 500) return 'Master Farmer 👨‍🌾';
+    if (givenCount >= 250) return 'Harvest Machine 🚜';
+    if (givenCount >= 100) return 'Tree Hugger 🌳';
+    if (givenCount >= 50) return 'Green Thumb 🪴';
+    if (givenCount >= 10) return 'First Rain 🌧️';
+    return 'Dirt Digger ⛏️';
+}
+
+// 🏠 Home Tab
+app.event('app_home_opened', async ({ event, client }) => {
+    const userId = event.user;
+
+    const [profileResult, leaderboardResult, giversResult] = await Promise.all([
+        supabase.from('profiles').select('given_count, received_count, remaining_daily').eq('id', userId).single(),
+        supabase.from('profiles').select('id, received_count').order('received_count', { ascending: false }).limit(10),
+        supabase.from('profiles').select('id, given_count').order('given_count', { ascending: false }).limit(10),
+    ]);
+
+    const given = profileResult.data?.given_count ?? 0;
+    const received = profileResult.data?.received_count ?? 0;
+    const remaining = profileResult.data?.remaining_daily ?? DEFAULT_DAILY_AVOCADOS;
+    const giverTitle = getGiverTitle(given);
+    const receiverTitle = getTitle(received);
+    const leaders = leaderboardResult.data || [];
+    const givers = giversResult.data || [];
+
+    // Leaderboard 블록 생성
+    const leaderboardBlocks = leaders.map((u, i) => {
+        const rank = `${i + 1}.`;
+        const userTitle = getTitle(u.received_count);
+        return {
+            type: 'section',
+            text: {
+                type: 'mrkdwn',
+                text: `${rank} <@${u.id}>  *${u.received_count}*  [ ${userTitle} ]`,
+            },
+        };
+    });
+
+    // Top Givers 블록 생성
+    const giversBlocks = givers.map((u, i) => {
+        const rank = `${i + 1}.`;
+        const giverTitle = getGiverTitle(u.given_count);
+        return {
+            type: 'section',
+            text: {
+                type: 'mrkdwn',
+                text: `${rank} <@${u.id}>  *${u.given_count}*  [ ${giverTitle} ]`,
+            },
+        };
+    });
+
+    await client.views.publish({
+        user_id: userId,
+        view: {
+            type: 'home',
+            blocks: [
+                {
+                    type: 'header',
+                    text: { type: 'plain_text', text: 'My Avo Stats 🥑', emoji: true },
+                },
+                { type: 'divider' },
+                {
+                    type: 'section',
+                    text: {
+                        type: 'mrkdwn',
+                        text: `Given:  *${given}*  [ ${giverTitle} ]\nReceived:  *${received}*  [ ${receiverTitle} ]\nAvos left to give today:  *${remaining}*`,
+                    },
+                },
+
+                { type: 'context', elements: [{ type: 'mrkdwn', text: ' ' }] },
+                {
+                    type: 'header',
+                    text: { type: 'plain_text', text: 'Top Avo Givers 🫴', emoji: true },
+                },
+                { type: 'divider' },
+                ...giversBlocks,
+
+                { type: 'context', elements: [{ type: 'mrkdwn', text: ' ' }] },
+                {
+                    type: 'header',
+                    text: { type: 'plain_text', text: 'Top Avo Receivers 🧺', emoji: true },
+                },
+                { type: 'divider' },
+                ...leaderboardBlocks,
+
+                { type: 'context', elements: [{ type: 'mrkdwn', text: ' ' }] },
+                { type: 'divider' },
+                {
+                    type: 'context',
+                    elements: [
+                        {
+                            type: 'mrkdwn',
+                            text: '💡 *Tip:* Mention a teammate with 🥑 to spread the good vibes!',
+                        },
+                    ],
+                },
+            ],
+        },
+    });
 });
 
 module.exports = async (req, res) => {

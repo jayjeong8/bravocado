@@ -4,6 +4,7 @@
 -- 1. Profiles table
 create table profiles (
   id text primary key,
+  given_count int default 0,
   received_count int default 0,
   remaining_daily int default 5
 );
@@ -34,7 +35,7 @@ begin
   insert into profiles (id, received_count) values (receiver_id_input, 0) on conflict (id) do nothing;
 
   -- Update counters
-  update profiles set remaining_daily = remaining_daily - count where id = sender_id_input;
+  update profiles set remaining_daily = remaining_daily - count, given_count = given_count + count where id = sender_id_input;
   update profiles set received_count = received_count + count where id = receiver_id_input;
 
   -- Log transaction
