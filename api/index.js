@@ -74,7 +74,7 @@ function buildResultMessage(successList, failedList, remainingAfter, selfInclude
     let msg = `${recipientList} received *${avocadoCount} avo${countPlural}* from you. You have *${remainingAfter} avo${remainPlural}* left to give out today.`;
 
     if (selfIncluded) {
-        msg += `\n(I skipped you, because you can't give avocados to yourself!)`;
+        msg += `\n(I skipped you, because you can't give avos to yourself!)`;
     }
 
     return msg;
@@ -119,7 +119,7 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
 
     // 자기 자신에게만 보낸 경우
     if (receiverIds.length === 0) {
-        await sendDM(sender, `We love self-care, but avocados are for sharing! 🥑 You can't give them to yourself.`);
+        await sendDM(sender, `We love self-care, but avos are for sharing! 🥑 You can't give them to yourself.`);
         return;
     }
 
@@ -136,7 +136,7 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
     if (!canDistribute(receiverIds, avocadoCount, remaining)) {
         const totalNeeded = avocadoCount * receiverIds.length;
         const plural = remaining !== 1 ? 's' : '';
-        await sendDM(sender, `You tried to give *${totalNeeded} avo${totalNeeded > 1 ? 's' : ''}* to ${receiverIds.length} people, but you only have *${remaining} avo${plural}* left. No avocados were sent. You have *${remaining} avo${plural}* left to give out today.`);
+        await sendDM(sender, `You tried to give *${totalNeeded} avo${totalNeeded > 1 ? 's' : ''}* to ${receiverIds.length} people, but you only have *${remaining} avo${plural}* left. No avos were sent. You have *${remaining} avo${plural}* left to give out today.`);
         return;
     }
 
