@@ -42,3 +42,27 @@ begin
   values (sender_id_input, receiver_id_input, count, 'avocado', message_text, channel_id_input);
 end;
 $$ language plpgsql;
+
+-- 4. Enable pg_cron extension
+create extension if not exists pg_cron;
+
+-- 5. Daily avocado reset function
+create or replace function reset_daily_avocados() returns void as $$
+begin
+  update profiles set remaining_daily = 5;
+end;
+$$ language plpgsql;
+
+-- 6. Schedule daily reset (KST 00:00 = UTC 15:00)
+select cron.schedule(
+  'reset-daily-avocados',
+  '0 15 * * *',
+  'select reset_daily_avocados();'
+);
+
+-- Alternative: UTC 00:00 reset
+-- select cron.schedule(
+--   'reset-daily-avocados',
+--   '0 0 * * *',
+--   'select reset_daily_avocados();'
+-- );
