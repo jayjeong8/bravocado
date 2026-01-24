@@ -173,7 +173,7 @@ function getGiverTitle(givenCount) {
     if (givenCount >= 100) return '🌳 Tree Hugger';
     if (givenCount >= 50) return '🪴 Green Thumb';
     if (givenCount >= 10) return '🌧️ First Rain';
-    return '🌰 Dirt Digger';
+    return '⛏️ Dirt Digger';
 }
 
 // 🏠 Home Tab
