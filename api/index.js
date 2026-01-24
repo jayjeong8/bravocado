@@ -47,21 +47,10 @@ function parseAvocadoMessage(message) {
     return { sender, receiverIds, avocadoCount, selfIncluded };
 }
 
-// 아보카도 분배 계산 (순수 함수)
-function calculateDistribution(receiverIds, avocadoCount, remaining) {
+// 아보카도 분배 가능 여부 확인 (all-or-nothing)
+function canDistribute(receiverIds, avocadoCount, remaining) {
     const totalNeeded = avocadoCount * receiverIds.length;
-    const actualTotal = Math.min(totalNeeded, remaining);
-
-    const distribution = [];
-    let remainingToDistribute = actualTotal;
-
-    for (const receiverId of receiverIds) {
-        const countForThis = Math.min(avocadoCount, remainingToDistribute);
-        distribution.push({ receiverId, count: countForThis });
-        remainingToDistribute -= countForThis;
-    }
-
-    return distribution;
+    return totalNeeded <= remaining;
 }
 
 // 결과 메시지 생성 (순수 함수)
@@ -126,7 +115,7 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
     const parsed = parseAvocadoMessage(message);
     if (!parsed) return;
 
-    const { sender, receiverIds, avocadoCount } = parsed;
+    const { sender, receiverIds, avocadoCount, selfIncluded } = parsed;
 
     // 자기 자신에게만 보낸 경우
     if (receiverIds.length === 0) {
@@ -134,7 +123,7 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
         return;
     }
 
-    // 잔여 개수 확인 (루프 밖에서 한 번만)
+    // 잔여 개수 확인
     const { data: user } = await supabase.from('profiles').select('remaining_daily').eq('id', sender).single();
     const remaining = user ? user.remaining_daily : DEFAULT_DAILY_AVOCADOS;
 
@@ -143,11 +132,19 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
         return;
     }
 
-    const distribution = calculateDistribution(receiverIds, avocadoCount, remaining);
+    // All-or-nothing: 부족하면 아무에게도 보내지 않음
+    if (!canDistribute(receiverIds, avocadoCount, remaining)) {
+        const totalNeeded = avocadoCount * receiverIds.length;
+        const plural = remaining !== 1 ? 's' : '';
+        await sendDM(sender, `You tried to give ${totalNeeded} 🥑${totalNeeded > 1 ? 's' : ''} to ${receiverIds.length} people, but you only have ${remaining} 🥑${plural} left. No avocados were sent. You have ${remaining} 🥑${plural} left to give out today.`);
+        return;
+    }
+
+    const distribution = receiverIds.map(id => ({ receiverId: id, count: avocadoCount }));
     const { successList, failedList } = await processAvocadoTransfers(distribution, sender, message);
 
     // 결과 DM 전송
-    if (successList.length > 0 || failedList.length > 0) {
+    if (successList.length > 0) {
         const { data: updatedUser } = await supabase
             .from('profiles')
             .select('remaining_daily')
