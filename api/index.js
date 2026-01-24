@@ -156,7 +156,6 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
     }
 });
 
-
 // 칭호 계산
 function getTitle(receivedCount) {
     if (receivedCount >= 500) return '👑 Holy Guacamole';
@@ -172,10 +171,11 @@ app.event('app_home_opened', async ({ event, client }) => {
     const userId = event.user;
 
     const [profileResult, leaderboardResult] = await Promise.all([
-        supabase.from('profiles').select('received_count, remaining_daily').eq('id', userId).single(),
+        supabase.from('profiles').select('given_count, received_count, remaining_daily').eq('id', userId).single(),
         supabase.from('profiles').select('id, received_count').order('received_count', { ascending: false }).limit(10),
     ]);
 
+    const given = profileResult.data?.given_count ?? 0;
     const received = profileResult.data?.received_count ?? 0;
     const remaining = profileResult.data?.remaining_daily ?? DEFAULT_DAILY_AVOCADOS;
     const title = getTitle(received);
@@ -190,7 +190,7 @@ app.event('app_home_opened', async ({ event, client }) => {
             type: 'section',
             text: {
                 type: 'mrkdwn',
-                text: `${medal} <@${u.id}>  ·  *${u.received_count}* avos  ·  _${userTitle}_`,
+                text: `${medal} <@${u.id}> · *${u.received_count}* · ${userTitle}`,
             },
         };
     });
@@ -202,20 +202,19 @@ app.event('app_home_opened', async ({ event, client }) => {
             blocks: [
                 {
                     type: 'header',
-                    text: { type: 'plain_text', text: '🥑 Bravocado!', emoji: true },
+                    text: { type: 'plain_text', text: 'My Avo Stats', emoji: true },
                 },
-                { type: 'divider' },
                 {
                     type: 'section',
                     text: {
                         type: 'mrkdwn',
-                        text: `*My Stats*\n\n✨ *My Title:* ${title}\n🥑 *Avos Received:* ${received}\n🫴 *Avos to Give Today:* ${remaining}`,
+                        text: `My Title: *${title}*\n Given: *${given}*🫴 | Received: *${received}*🧺\n Avos left to give today: *${remaining}*`,
                     },
                 },
                 { type: 'divider' },
                 {
                     type: 'header',
-                    text: { type: 'plain_text', text: '🏆 Top Avos', emoji: true },
+                    text: { type: 'plain_text', text: 'Top Avos 🏆', emoji: true },
                 },
                 ...leaderboardBlocks,
                 { type: 'divider' },
