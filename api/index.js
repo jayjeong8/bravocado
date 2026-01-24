@@ -53,31 +53,31 @@ function canDistribute(receiverIds, avocadoCount, remaining) {
     return totalNeeded <= remaining;
 }
 
+// 수신자 목록 포맷팅 (Oxford comma)
+function formatRecipientList(receiverIds) {
+    if (receiverIds.length === 1) return `<@${receiverIds[0]}>`;
+    if (receiverIds.length === 2) return `<@${receiverIds[0]}> and <@${receiverIds[1]}>`;
+    const last = receiverIds[receiverIds.length - 1];
+    const rest = receiverIds.slice(0, -1).map(id => `<@${id}>`).join(', ');
+    return `${rest}, and <@${last}>`;
+}
+
 // 결과 메시지 생성 (순수 함수)
-function buildResultMessage(successList, failedList, remainingAfter) {
-    let resultMessage = '';
+function buildResultMessage(successList, failedList, remainingAfter, selfIncluded) {
+    if (successList.length === 0) return null;
 
-    if (successList.length > 0) {
-        resultMessage = `Bravocado! 🥑 아보카도를 보냈어요!\n`;
-        for (const { receiverId, count } of successList) {
-            resultMessage += `<@${receiverId}>님에게 ${count}개\n`;
-        }
+    const avocadoCount = successList[0].count;
+    const countPlural = avocadoCount > 1 ? 's' : '';
+    const remainPlural = remainingAfter !== 1 ? 's' : '';
+    const recipientList = formatRecipientList(successList.map(s => s.receiverId));
+
+    let msg = `${recipientList} received ${avocadoCount} 🥑${countPlural} from you. You have ${remainingAfter} 🥑${remainPlural} left to give out today.`;
+
+    if (selfIncluded) {
+        msg += `\n(I skipped you, because you can't give avocados to yourself!)`;
     }
 
-    if (failedList.length > 0) {
-        if (resultMessage) resultMessage += '\n';
-        resultMessage += `오늘 아보카도를 다 써서 `;
-        resultMessage += failedList.map(id => `<@${id}>`).join(', ');
-        resultMessage += `님에게는 보내지 못했어요.`;
-    }
-
-    if (!resultMessage) return null;
-
-    const remainingText = remainingAfter > 0
-        ? `오늘 남은 아보카도: ${remainingAfter}개`
-        : `오늘 아보카도를 모두 나눠줬어요! 내일 또 만나요.`;
-
-    return `${resultMessage}\n${remainingText}`;
+    return msg;
 }
 
 // 아보카도 전송 처리 (DB 저장 + 수신자 DM)
@@ -152,7 +152,7 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
             .single();
         const remainingAfter = updatedUser ? updatedUser.remaining_daily : 0;
 
-        const resultMessage = buildResultMessage(successList, failedList, remainingAfter);
+        const resultMessage = buildResultMessage(successList, failedList, remainingAfter, selfIncluded);
         if (resultMessage) {
             await sendDM(sender, resultMessage);
         }
