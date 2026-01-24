@@ -207,7 +207,7 @@ app.event('app_home_opened', async ({ event, client }) => {
                     type: 'section',
                     text: {
                         type: 'mrkdwn',
-                        text: `My Title: *${title}*\nGiven: *${given}*🫴 | Received: *${received}*🧺\nAvos left to give today: *${remaining}*`,
+                        text: `My Title: *${title}*\n🫴 Given: *${given}* | 🧺 Received: *${received}*\nAvos left to give today: *${remaining}*`,
                     },
                 },
                 { type: 'divider' },
