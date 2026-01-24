@@ -101,7 +101,7 @@ async function processAvocadoTransfers(distribution, sender, message) {
 
         if (!error) {
             successList.push({ receiverId, count });
-            await sendDM(receiverId, `You received *${count} avo${count > 1 ? 's' : ''}* from <@${sender}> in <#${message.channel}>.\n💬 ${message.text}`);
+            await sendDM(receiverId, `You received *${count} avo${count > 1 ? 's' : ''}* from <@${sender}> in <#${message.channel}>.\n> ${message.text}`);
         } else {
             failedList.push(receiverId);
         }
