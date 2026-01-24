@@ -189,7 +189,8 @@ app.event('app_home_opened', async ({ event, client }) => {
     const given = profileResult.data?.given_count ?? 0;
     const received = profileResult.data?.received_count ?? 0;
     const remaining = profileResult.data?.remaining_daily ?? DEFAULT_DAILY_AVOCADOS;
-    const title = getTitle(received);
+    const giverTitle = getGiverTitle(given);
+    const receiverTitle = getTitle(received);
     const leaders = leaderboardResult.data || [];
     const givers = giversResult.data || [];
 
@@ -232,7 +233,7 @@ app.event('app_home_opened', async ({ event, client }) => {
                     type: 'section',
                     text: {
                         type: 'mrkdwn',
-                        text: `My Title: *${title}*\n🫴 Given: *${given}* | 🧺 Received: *${received}*\nAvos left to give today: *${remaining}*`,
+                        text: `🫴 Given: *${given}* · ${giverTitle}\n🧺 Received: *${received}* · ${receiverTitle}\nAvos left to give today: *${remaining}*`,
                     },
                 },
                 { type: 'divider' },
