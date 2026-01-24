@@ -40,10 +40,11 @@ function parseAvocadoMessage(message) {
     const avocadoCount = countAvocados(message.text);
     if (avocadoCount === 0) return null;
 
-    const receiverIds = [...new Set(matches.map(m => m.replace(/[<@>]/g, '')))]
-        .filter(id => id !== sender);
+    const allReceiverIds = [...new Set(matches.map(m => m.replace(/[<@>]/g, '')))];
+    const selfIncluded = allReceiverIds.includes(sender);
+    const receiverIds = allReceiverIds.filter(id => id !== sender);
 
-    return { sender, receiverIds, avocadoCount };
+    return { sender, receiverIds, avocadoCount, selfIncluded };
 }
 
 // 아보카도 분배 계산 (순수 함수)
