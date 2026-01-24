@@ -238,13 +238,13 @@ app.event('app_home_opened', async ({ event, client }) => {
                 { type: 'divider' },
                 {
                     type: 'header',
-                    text: { type: 'plain_text', text: 'Top Avo Givers 🫴', emoji: true },
+                    text: { type: 'plain_text', text: 'Top Avo Givers', emoji: true },
                 },
                 ...giversBlocks,
                 { type: 'divider' },
                 {
                     type: 'header',
-                    text: { type: 'plain_text', text: 'Top Avo Receivers 🧺', emoji: true },
+                    text: { type: 'plain_text', text: 'Top Avo Receivers', emoji: true },
                 },
                 ...leaderboardBlocks,
                 { type: 'divider' },
