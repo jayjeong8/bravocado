@@ -116,7 +116,11 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
 
     // 자기 자신에게만 보낸 경우
     if (receiverIds.length === 0) {
-        await sendDM(sender, `We love self-care, but avos are for sharing! 🥑 You can't give them to yourself.`);
+        await app.client.chat.postEphemeral({
+            channel: message.channel,
+            user: sender,
+            text: `We love self-care, but avos are for sharing! 🥑 You can't give them to yourself.`
+        });
         return;
     }
 
@@ -125,7 +129,11 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
     const remaining = user ? user.remaining_daily : DEFAULT_DAILY_AVOCADOS;
 
     if (remaining <= 0) {
-        await sendDM(sender, `You're too generous! You've used up your daily supply. You have *0 avos* left. Come back tomorrow to spread more love. 💚`);
+        await app.client.chat.postEphemeral({
+            channel: message.channel,
+            user: sender,
+            text: `You're too generous! You've used up your daily supply. You have *0 avos* left. Come back tomorrow to spread more love. 💚`
+        });
         return;
     }
 
@@ -133,7 +141,11 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
     if (!canDistribute(receiverIds, avocadoCount, remaining)) {
         const totalNeeded = avocadoCount * receiverIds.length;
         const plural = remaining !== 1 ? 's' : '';
-        await sendDM(sender, `You tried to give *${totalNeeded} avo${totalNeeded > 1 ? 's' : ''}* to ${receiverIds.length} people, but you only have *${remaining} avo${plural}* left. No avos were sent. You have *${remaining} avo${plural}* left to give out today.`);
+        await app.client.chat.postEphemeral({
+            channel: message.channel,
+            user: sender,
+            text: `You tried to give *${totalNeeded} avo${totalNeeded > 1 ? 's' : ''}* to ${receiverIds.length} people, but you only have *${remaining} avo${plural}* left. No avos were sent. You have *${remaining} avo${plural}* left to give out today.`
+        });
         return;
     }
 
