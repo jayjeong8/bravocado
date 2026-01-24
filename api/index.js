@@ -170,9 +170,10 @@ function getTitle(receivedCount) {
 app.event('app_home_opened', async ({ event, client }) => {
     const userId = event.user;
 
-    const [profileResult, leaderboardResult] = await Promise.all([
+    const [profileResult, leaderboardResult, giversResult] = await Promise.all([
         supabase.from('profiles').select('given_count, received_count, remaining_daily').eq('id', userId).single(),
         supabase.from('profiles').select('id, received_count').order('received_count', { ascending: false }).limit(10),
+        supabase.from('profiles').select('id, given_count').order('given_count', { ascending: false }).limit(10),
     ]);
 
     const given = profileResult.data?.given_count ?? 0;
@@ -180,6 +181,7 @@ app.event('app_home_opened', async ({ event, client }) => {
     const remaining = profileResult.data?.remaining_daily ?? DEFAULT_DAILY_AVOCADOS;
     const title = getTitle(received);
     const leaders = leaderboardResult.data || [];
+    const givers = giversResult.data || [];
 
     // Leaderboard 블록 생성
     const leaderboardBlocks = leaders.map((u, i) => {
@@ -190,6 +192,18 @@ app.event('app_home_opened', async ({ event, client }) => {
             text: {
                 type: 'mrkdwn',
                 text: `${rank} <@${u.id}> · *${u.received_count}* · ${userTitle}`,
+            },
+        };
+    });
+
+    // Top Givers 블록 생성
+    const giversBlocks = givers.map((u, i) => {
+        const rank = `${i + 1}.`;
+        return {
+            type: 'section',
+            text: {
+                type: 'mrkdwn',
+                text: `${rank} <@${u.id}> · *${u.given_count}*`,
             },
         };
     });
@@ -216,6 +230,12 @@ app.event('app_home_opened', async ({ event, client }) => {
                     text: { type: 'plain_text', text: 'Top Avos 🏆', emoji: true },
                 },
                 ...leaderboardBlocks,
+                { type: 'divider' },
+                {
+                    type: 'header',
+                    text: { type: 'plain_text', text: 'Top Givers 🫴', emoji: true },
+                },
+                ...giversBlocks,
                 { type: 'divider' },
                 {
                     type: 'context',
