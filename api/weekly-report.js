@@ -42,7 +42,7 @@ function buildRankingList(items) {
 
 function buildWeeklyReport(topGivers, topReceivers, myTopGiven) {
     if (topGivers.length === 0 && topReceivers.length === 0) {
-        return `🥑 *Weekly Avo Report* 🥑\n\nIt was a quiet week — no avos were given. Be the first one next week! 🌱`;
+        return `*Weekly Avo Report* 🥑📊\n\nIt was a quiet week — no avos were given. Be the first one next week! 🌱`;
     }
 
     const sections = [
