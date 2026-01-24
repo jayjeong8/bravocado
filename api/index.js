@@ -182,15 +182,14 @@ app.event('app_home_opened', async ({ event, client }) => {
     const leaders = leaderboardResult.data || [];
 
     // Leaderboard 블록 생성
-    const medalEmojis = ['🥇', '🥈', '🥉'];
     const leaderboardBlocks = leaders.map((u, i) => {
-        const medal = medalEmojis[i] || `${i + 1}.`;
+        const rank = `${i + 1}.`;
         const userTitle = getTitle(u.received_count);
         return {
             type: 'section',
             text: {
                 type: 'mrkdwn',
-                text: `${medal} <@${u.id}> · *${u.received_count}* · ${userTitle}`,
+                text: `${rank} <@${u.id}> · *${u.received_count}* · ${userTitle}`,
             },
         };
     });
@@ -208,7 +207,7 @@ app.event('app_home_opened', async ({ event, client }) => {
                     type: 'section',
                     text: {
                         type: 'mrkdwn',
-                        text: `My Title: *${title}*\n Given: *${given}*🫴 | Received: *${received}*🧺\n Avos left to give today: *${remaining}*`,
+                        text: `My Title: *${title}*\nGiven: *${given}*🫴 | Received: *${received}*🧺\nAvos left to give today: *${remaining}*`,
                     },
                 },
                 { type: 'divider' },
