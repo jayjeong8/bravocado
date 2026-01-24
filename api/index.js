@@ -101,7 +101,7 @@ async function processAvocadoTransfers(distribution, sender, message) {
 
         if (!error) {
             successList.push({ receiverId, count });
-            await sendDM(receiverId, `<@${sender}>님이 아보카도 ${count}개를 보냈어요! 🥑\n💬 ${message.text}`);
+            await sendDM(receiverId, `You received ${count} 🥑${count > 1 ? 's' : ''} from <@${sender}> in <#${message.channel}>.\n💬 ${message.text}`);
         } else {
             failedList.push(receiverId);
         }
