@@ -229,6 +229,7 @@ app.event('app_home_opened', async ({ event, client }) => {
                     type: 'header',
                     text: { type: 'plain_text', text: '🥑 My Avo Stats', emoji: true },
                 },
+                { type: 'divider' },
                 {
                     type: 'section',
                     text: {
@@ -236,18 +237,24 @@ app.event('app_home_opened', async ({ event, client }) => {
                         text: `Given: *${given}* · ${giverTitle}\nReceived: *${received}* · ${receiverTitle}\nAvos left to give today: *${remaining}*`,
                     },
                 },
-                { type: 'divider' },
+
+                { type: 'context', elements: [{ type: 'mrkdwn', text: ' ' }] },
                 {
                     type: 'header',
                     text: { type: 'plain_text', text: '🫴 Top Avo Givers', emoji: true },
                 },
-                ...giversBlocks,
                 { type: 'divider' },
+                ...giversBlocks,
+
+                { type: 'context', elements: [{ type: 'mrkdwn', text: ' ' }] },
                 {
                     type: 'header',
                     text: { type: 'plain_text', text: '🧺 Top Avo Receivers', emoji: true },
                 },
+                { type: 'divider' },
                 ...leaderboardBlocks,
+
+                { type: 'context', elements: [{ type: 'mrkdwn', text: ' ' }] },
                 { type: 'divider' },
                 {
                     type: 'context',
