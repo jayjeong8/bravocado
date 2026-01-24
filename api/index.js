@@ -156,7 +156,7 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
     }
 });
 
-// 칭호 계산
+// 칭호 계산 (받은 사람)
 function getTitle(receivedCount) {
     if (receivedCount >= 500) return '👑 Holy Guacamole';
     if (receivedCount >= 250) return '✨ Certified Fresh';
@@ -164,6 +164,16 @@ function getTitle(receivedCount) {
     if (receivedCount >= 50) return '☀️ Warming Up';
     if (receivedCount >= 10) return '💧 Just Watered';
     return '🌱 Seed Mode';
+}
+
+// 칭호 계산 (준 사람)
+function getGiverTitle(givenCount) {
+    if (givenCount >= 500) return '👨‍🌾 Master Farmer';
+    if (givenCount >= 250) return '🚜 Harvest Machine';
+    if (givenCount >= 100) return '🌳 Tree Hugger';
+    if (givenCount >= 50) return '🪴 Green Thumb';
+    if (givenCount >= 10) return '🌧️ First Rain';
+    return '🌰 Dirt Digger';
 }
 
 // 🏠 Home Tab
@@ -199,11 +209,12 @@ app.event('app_home_opened', async ({ event, client }) => {
     // Top Givers 블록 생성
     const giversBlocks = givers.map((u, i) => {
         const rank = `${i + 1}.`;
+        const giverTitle = getGiverTitle(u.given_count);
         return {
             type: 'section',
             text: {
                 type: 'mrkdwn',
-                text: `${rank} <@${u.id}> · *${u.given_count}*`,
+                text: `${rank} <@${u.id}> · *${u.given_count}* · ${giverTitle}`,
             },
         };
     });
@@ -233,7 +244,7 @@ app.event('app_home_opened', async ({ event, client }) => {
                 { type: 'divider' },
                 {
                     type: 'header',
-                    text: { type: 'plain_text', text: 'Top Avo Receivers 🏆', emoji: true },
+                    text: { type: 'plain_text', text: 'Top Avo Receivers 🧺', emoji: true },
                 },
                 ...leaderboardBlocks,
                 { type: 'divider' },
