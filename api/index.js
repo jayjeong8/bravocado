@@ -156,15 +156,6 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
     }
 });
 
-// 🏆 리더보드
-app.command('/avo-leaderboard', async ({ ack, respond }) => {
-    await ack();
-    const { data: leaders } = await supabase.from('profiles').select('id, received_count').order('received_count', { ascending: false }).limit(5);
-
-    let msg = "*🏆 명예의 전당*\n";
-    leaders?.forEach((u, i) => msg += `${i+1}위 <@${u.id}>: ${u.received_count} 🥑\n`);
-    await respond(msg);
-});
 
 // 칭호 계산
 function getTitle(receivedCount) {
