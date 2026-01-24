@@ -55,11 +55,8 @@ function canDistribute(receiverIds, avocadoCount, remaining) {
 
 // 수신자 목록 포맷팅 (Oxford comma)
 function formatRecipientList(receiverIds) {
-    if (receiverIds.length === 1) return `<@${receiverIds[0]}>`;
-    if (receiverIds.length === 2) return `<@${receiverIds[0]}> and <@${receiverIds[1]}>`;
-    const last = receiverIds[receiverIds.length - 1];
-    const rest = receiverIds.slice(0, -1).map(id => `<@${id}>`).join(', ');
-    return `${rest}, and <@${last}>`;
+    const formatter = new Intl.ListFormat('en', { style: 'long', type: 'conjunction' });
+    return formatter.format(receiverIds.map(id => `<@${id}>`));
 }
 
 // 결과 메시지 생성 (순수 함수)
