@@ -116,7 +116,11 @@ app.message(/:avocado:|🥑/, async ({ message }) => {
 
     // 자기 자신에게만 보낸 경우
     if (receiverIds.length === 0) {
-        await sendDM(sender, `We love self-care, but avos are for sharing! 🥑 You can't give them to yourself.`);
+        await app.client.chat.postEphemeral({
+            channel: message.channel,
+            user: sender,
+            text: `We love self-care, but avos are for sharing! 🥑 You can't give them to yourself.`
+        });
         return;
     }
 
