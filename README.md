@@ -115,3 +115,14 @@ CRON_SECRET=your-cron-secret
 
 The cron job (`0 0 * * 1`) triggers `/api/weekly-report` every Monday at 00:00 UTC.
 
+### 5. Testing Weekly Report
+
+You can manually trigger the weekly report endpoint for testing:
+
+```bash
+curl -X POST https://your-app.vercel.app/api/weekly-report \
+  -H "Authorization: Bearer your-cron-secret"
+```
+
+Replace `your-cron-secret` with your actual `CRON_SECRET` environment variable value.
+
