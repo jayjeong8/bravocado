@@ -1,8 +1,11 @@
 # Bravocado 🥑
 
+<img src="assets/avo_rounded_small.png" alt="Bravocado" width="200" />
+
 **The tastiest way to build a culture of gratitude in your Slack workspace.**
 
 ![Stack](https://img.shields.io/badge/stack-Node.js%20%7C%20Supabase%20%7C%20Slack_Bolt-%234f7002)
+
 
 ## Introduction
 
