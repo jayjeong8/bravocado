@@ -112,3 +112,14 @@ CRON_SECRET=your-cron-secret
 3. 배포 — `vercel.json`이 라우팅과 크론 스케줄링을 자동으로 처리합니다.
 
 크론 작업(`0 0 * * 1`)은 매주 월요일 00:00 UTC에 `/api/weekly-report`를 트리거합니다.
+
+### 5. 주간 리포트 테스트
+
+주간 리포트 엔드포인트를 수동으로 트리거하여 테스트할 수 있습니다:
+
+```bash
+curl -X POST https://your-app.vercel.app/api/weekly-report \
+  -H "Authorization: Bearer your-cron-secret"
+```
+
+`your-cron-secret`을 실제 `CRON_SECRET` 환경 변수 값으로 교체하세요.

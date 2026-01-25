@@ -208,27 +208,29 @@ app.event('app_home_opened', async ({ event, client }) => {
 
     // Leaderboard 블록 생성
     const leaderboardBlocks = leaders.map((u, i) => {
-        const rank = `${i + 1}.`;
         const userTitle = getTitle(u.received_count);
         return {
-            type: 'section',
-            text: {
-                type: 'mrkdwn',
-                text: `${rank} <@${u.id}>  *${u.received_count}*  [ ${userTitle} ]`,
-            },
+            type: 'context',
+            elements: [
+                { type: 'mrkdwn', text: `*${i + 1}.*` },
+                { type: 'mrkdwn', text: `<@${u.id}>` },
+                { type: 'mrkdwn', text: `*${u.received_count}*` },
+                { type: 'mrkdwn', text: `\`${userTitle}\`` },
+            ],
         };
     });
 
     // Top Givers 블록 생성
     const giversBlocks = givers.map((u, i) => {
-        const rank = `${i + 1}.`;
         const giverTitle = getGiverTitle(u.given_count);
         return {
-            type: 'section',
-            text: {
-                type: 'mrkdwn',
-                text: `${rank} <@${u.id}>  *${u.given_count}*  [ ${giverTitle} ]`,
-            },
+            type: 'context',
+            elements: [
+                { type: 'mrkdwn', text: `*${i + 1}.*` },
+                { type: 'mrkdwn', text: `<@${u.id}>` },
+                { type: 'mrkdwn', text: `*${u.given_count}*` },
+                { type: 'mrkdwn', text: `\`${giverTitle}\`` },
+            ],
         };
     });
 
@@ -243,14 +245,29 @@ app.event('app_home_opened', async ({ event, client }) => {
                 },
                 { type: 'divider' },
                 {
-                    type: 'section',
-                    text: {
-                        type: 'mrkdwn',
-                        text: `Given:  *${given}*  [ ${giverTitle} ]\nReceived:  *${received}*  [ ${receiverTitle} ]\nAvos left to give today:  *${remaining}*`,
-                    },
+                    type: 'context',
+                    elements: [
+                        { type: 'mrkdwn', text: 'Given' },
+                        { type: 'mrkdwn', text: `*${given}*` },
+                        { type: 'mrkdwn', text: `\`${giverTitle}\`` },
+                    ],
+                },
+                {
+                    type: 'context',
+                    elements: [
+                        { type: 'mrkdwn', text: 'Received' },
+                        { type: 'mrkdwn', text: `*${received}*` },
+                        { type: 'mrkdwn', text: `\`${receiverTitle}\`` },
+                    ],
+                },
+                {
+                    type: 'context',
+                    elements: [
+                        { type: 'mrkdwn', text: 'Avos left to give today' },
+                        { type: 'mrkdwn', text: `*${remaining}*` },
+                    ],
                 },
 
-                { type: 'context', elements: [{ type: 'mrkdwn', text: ' ' }] },
                 {
                     type: 'header',
                     text: { type: 'plain_text', text: 'Top Avo Givers 🫴', emoji: true },
@@ -258,7 +275,6 @@ app.event('app_home_opened', async ({ event, client }) => {
                 { type: 'divider' },
                 ...giversBlocks,
 
-                { type: 'context', elements: [{ type: 'mrkdwn', text: ' ' }] },
                 {
                     type: 'header',
                     text: { type: 'plain_text', text: 'Top Avo Receivers 🧺', emoji: true },
