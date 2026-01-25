@@ -214,7 +214,7 @@ app.event('app_home_opened', async ({ event, client }) => {
             type: 'section',
             text: {
                 type: 'mrkdwn',
-                text: `${rank} <@${u.id}>  *${u.received_count}*  [ ${userTitle} ]`,
+                text: `${rank} <@${u.id}>  *${u.received_count}*  \`${userTitle}\``,
             },
         };
     });
@@ -227,7 +227,7 @@ app.event('app_home_opened', async ({ event, client }) => {
             type: 'section',
             text: {
                 type: 'mrkdwn',
-                text: `${rank} <@${u.id}>  *${u.given_count}*  [ ${giverTitle} ]`,
+                text: `${rank} <@${u.id}>  *${u.given_count}*  \`${giverTitle}\``,
             },
         };
     });
@@ -246,7 +246,7 @@ app.event('app_home_opened', async ({ event, client }) => {
                     type: 'section',
                     text: {
                         type: 'mrkdwn',
-                        text: `Given:  *${given}*  [ ${giverTitle} ]\nReceived:  *${received}*  [ ${receiverTitle} ]\nAvos left to give today:  *${remaining}*`,
+                        text: `Given:  *${given}*  \`${giverTitle}\`\nReceived:  *${received}*  \`${receiverTitle}\`\nAvos left to give today:  *${remaining}*`,
                     },
                 },
 
