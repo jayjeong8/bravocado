@@ -4,6 +4,8 @@
 
 **The tastiest way to build a culture of gratitude in your Slack workspace.**
 
+[한국어](README.ko.md)
+
 ![Stack](https://img.shields.io/badge/stack-Node.js%20%7C%20Supabase%20%7C%20Slack_Bolt-%234f7002)
 
 
