@@ -245,11 +245,27 @@ app.event('app_home_opened', async ({ event, client }) => {
                 },
                 { type: 'divider' },
                 {
-                    type: 'section',
-                    text: {
-                        type: 'mrkdwn',
-                        text: `Given:  *${given}*  \`${giverTitle}\`\nReceived:  *${received}*  \`${receiverTitle}\`\nAvos left to give today:  *${remaining}*`,
-                    },
+                    type: 'context',
+                    elements: [
+                        { type: 'mrkdwn', text: 'Given' },
+                        { type: 'mrkdwn', text: `*${given}*` },
+                        { type: 'mrkdwn', text: `\`${giverTitle}\`` },
+                    ],
+                },
+                {
+                    type: 'context',
+                    elements: [
+                        { type: 'mrkdwn', text: 'Received' },
+                        { type: 'mrkdwn', text: `*${received}*` },
+                        { type: 'mrkdwn', text: `\`${receiverTitle}\`` },
+                    ],
+                },
+                {
+                    type: 'context',
+                    elements: [
+                        { type: 'mrkdwn', text: 'Avos left to give today' },
+                        { type: 'mrkdwn', text: `*${remaining}*` },
+                    ],
                 },
 
                 { type: 'context', elements: [{ type: 'mrkdwn', text: ' ' }] },
