@@ -268,7 +268,6 @@ app.event('app_home_opened', async ({ event, client }) => {
                     ],
                 },
 
-                { type: 'context', elements: [{ type: 'mrkdwn', text: ' ' }] },
                 {
                     type: 'header',
                     text: { type: 'plain_text', text: 'Top Avo Givers 🫴', emoji: true },
@@ -276,7 +275,6 @@ app.event('app_home_opened', async ({ event, client }) => {
                 { type: 'divider' },
                 ...giversBlocks,
 
-                { type: 'context', elements: [{ type: 'mrkdwn', text: ' ' }] },
                 {
                     type: 'header',
                     text: { type: 'plain_text', text: 'Top Avo Receivers 🧺', emoji: true },
