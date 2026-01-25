@@ -208,27 +208,29 @@ app.event('app_home_opened', async ({ event, client }) => {
 
     // Leaderboard 블록 생성
     const leaderboardBlocks = leaders.map((u, i) => {
-        const rank = `${i + 1}.`;
         const userTitle = getTitle(u.received_count);
         return {
-            type: 'section',
-            text: {
-                type: 'mrkdwn',
-                text: `${rank} <@${u.id}>  *${u.received_count}*  \`${userTitle}\``,
-            },
+            type: 'context',
+            elements: [
+                { type: 'mrkdwn', text: `*${i + 1}.*` },
+                { type: 'mrkdwn', text: `<@${u.id}>` },
+                { type: 'mrkdwn', text: `*${u.received_count}*` },
+                { type: 'mrkdwn', text: `\`${userTitle}\`` },
+            ],
         };
     });
 
     // Top Givers 블록 생성
     const giversBlocks = givers.map((u, i) => {
-        const rank = `${i + 1}.`;
         const giverTitle = getGiverTitle(u.given_count);
         return {
-            type: 'section',
-            text: {
-                type: 'mrkdwn',
-                text: `${rank} <@${u.id}>  *${u.given_count}*  \`${giverTitle}\``,
-            },
+            type: 'context',
+            elements: [
+                { type: 'mrkdwn', text: `*${i + 1}.*` },
+                { type: 'mrkdwn', text: `<@${u.id}>` },
+                { type: 'mrkdwn', text: `*${u.given_count}*` },
+                { type: 'mrkdwn', text: `\`${giverTitle}\`` },
+            ],
         };
     });
 
