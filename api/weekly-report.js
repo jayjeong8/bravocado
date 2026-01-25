@@ -34,32 +34,46 @@ function aggregateWeeklyStats(transactions) {
     return { topGivers, topReceivers, personalGiven };
 }
 
-function buildRankingList(items) {
-    return items.map((item, i) => {
-        return `${i + 1}. <@${item.id}>  *${item.total}*`;
-    }).join('\n');
+function buildRankingBlocks(items) {
+    return items.map((item, i) => ({
+        type: 'context',
+        elements: [
+            { type: 'mrkdwn', text: `*${i + 1}.*` },
+            { type: 'mrkdwn', text: `<@${item.id}>` },
+            { type: 'mrkdwn', text: `*${item.total}*` },
+        ],
+    }));
 }
 
-function buildWeeklyReport(topGivers, topReceivers, myTopGiven) {
+function buildWeeklyReportBlocks(topGivers, topReceivers, myTopGiven) {
     if (topGivers.length === 0 && topReceivers.length === 0) {
-        return `*Weekly Avo Report* 🥑📊\n\nIt was a quiet week — no avos were given. Be the first one next week! 🌱`;
+        return [
+            { type: 'header', text: { type: 'plain_text', text: 'Weekly Avo Report 🥑📊', emoji: true } },
+            { type: 'section', text: { type: 'mrkdwn', text: 'It was a quiet week — no avos were given. Be the first one next week! 🌱' } },
+        ];
     }
 
-    const sections = [
-        `🥑 *Weekly Avo Report* 🥑`,
-        ``,
-        `*Top 5 Givers* 🫴`,
-        buildRankingList(topGivers),
-        ``,
-        `*Top 5 Receivers* 🧺`,
-        buildRankingList(topReceivers),
+    const blocks = [
+        { type: 'header', text: { type: 'plain_text', text: 'Weekly Avo Report 🥑', emoji: true } },
+
+        { type: 'divider' },
+        { type: 'section', text: { type: 'mrkdwn', text: '*Top 5 Givers* 🫴' } },
+        ...buildRankingBlocks(topGivers),
+
+        { type: 'divider' },
+        { type: 'section', text: { type: 'mrkdwn', text: '*Top 5 Receivers* 🧺' } },
+        ...buildRankingBlocks(topReceivers),
     ];
 
     if (myTopGiven.length > 0) {
-        sections.push(``, `*You gave the most to* 💚`, buildRankingList(myTopGiven));
+        blocks.push(
+            { type: 'divider' },
+            { type: 'section', text: { type: 'mrkdwn', text: '*You gave the most to* 💚' } },
+            ...buildRankingBlocks(myTopGiven)
+        );
     }
 
-    return sections.join('\n');
+    return blocks;
 }
 
 module.exports = async (req, res) => {
@@ -91,8 +105,8 @@ module.exports = async (req, res) => {
                         .map(([id, total]) => ({ id, total }))
                     : [];
 
-                const message = buildWeeklyReport(topGivers, topReceivers, myGiven);
-                await slack.chat.postMessage({ channel: user.id, text: message });
+                const blocks = buildWeeklyReportBlocks(topGivers, topReceivers, myGiven);
+                await slack.chat.postMessage({ channel: user.id, blocks, text: 'Weekly Avo Report 🥑' });
                 sentCount++;
             } catch (err) {
                 console.error(`Failed to send weekly report to ${user.id}:`, err.message);
