@@ -73,7 +73,7 @@ Slack에서 **Bravocado** 앱을 클릭하면 App Home을 볼 수 있습니다:
 Supabase SQL Editor에서 [`supabase/schema.sql`](supabase/schema.sql)을 실행하세요. 다음을 생성합니다:
 - **`profiles`** — 사용자별 give/receive 카운트 및 일일 잔액
 - **`transactions`** — 컨텍스트와 함께 모든 아보카도 전송 기록
-- **`give_avocado()`** — 원자적 전송을 위한 트랜잭션 RPC
+- **`give_avocado()`** — 아보카도 전송 처리 (전부 성공 또는 전부 실패)
 - **`reset_daily_avocados()`** — 자정(KST)에 잔액을 초기화하는 스케줄 함수
 
 ### 2. 환경 변수
