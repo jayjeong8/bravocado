@@ -109,18 +109,23 @@ app.event('reaction_added', async ({ event, client }) => {
     const messageAuthor = originalMessage.user;
     const messageText = originalMessage.text || '';
 
-    // 자기 메시지에 리액션한 경우
-    if (senderId === messageAuthor) {
-        await sendEphemeral(client, channelId, senderId, buildErrorMessage('self_only'));
-        return;
-    }
-
     // 수신자 결정: 메시지에 멘션된 사람들이 있으면 그들에게, 없으면 메시지 작성자에게
     const mentionedUsers = extractMentions(messageText);
-    const { filtered: receiverIds, selfIncluded } = excludeSender(
-        mentionedUsers.length > 0 ? mentionedUsers : [messageAuthor],
-        senderId
-    );
+
+    let targetReceivers;
+    if (mentionedUsers.length > 0) {
+        // 멘션이 있으면 멘션된 사람들에게
+        targetReceivers = mentionedUsers;
+    } else {
+        // 멘션이 없으면 메시지 작성자에게 (단, 자기 메시지면 에러)
+        if (senderId === messageAuthor) {
+            await sendEphemeral(client, channelId, senderId, buildErrorMessage('self_only'));
+            return;
+        }
+        targetReceivers = [messageAuthor];
+    }
+
+    const { filtered: receiverIds, selfIncluded } = excludeSender(targetReceivers, senderId);
 
     if (receiverIds.length === 0) {
         await sendEphemeral(client, channelId, senderId, buildErrorMessage('self_only'));
