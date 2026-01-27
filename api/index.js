@@ -88,8 +88,8 @@ app.message(/:avocado:|🥑/, async ({ message, client }) => {
 
 // 리액션 기반 아보카도 전송
 app.event('reaction_added', async ({ event, client }) => {
-    // avocado 리액션만 처리
-    if (event.reaction !== 'avocado') return;
+    // avocado 리액션만 처리 (한국어 설정: "아보카도")
+    if (!['avocado', '아보카도'].includes(event.reaction)) return;
 
     const senderId = event.user;
     const channelId = event.item.channel;
