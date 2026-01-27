@@ -58,6 +58,11 @@ Slack에서 **Bravocado** 앱을 클릭하면 App Home을 볼 수 있습니다:
 - 전체 Top 5 givers와 receivers
 - 나의 Top 5 수신자
 
+### 7. 🎭 아보카도 농담
+Bravocado를 멘션하고 트리거 문구를 입력하면 랜덤 아보카도 농담을 받습니다:
+- **한국어:** `@Bravocado 잘 익었니?` 또는 `@Bravocado 농담`
+- **영어:** `@Bravocado make it ripe` 또는 `@Bravocado tell a joke`
+
 ---
 
 ## 기술 스택
@@ -108,6 +113,7 @@ CRON_SECRET=your-cron-secret
 - `message.channels` — 아보카도 메시지 감지
 - `reaction_added` — 아보카도 리액션 감지
 - `app_home_opened` — 홈 탭 대시보드 렌더링
+- `app_mention` — 멘션 시 농담 요청 응답
 
 ### 4. Vercel 배포
 

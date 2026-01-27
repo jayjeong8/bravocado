@@ -60,6 +60,11 @@ Every Monday at 09:00 KST, each user receives a DM summarizing the past week:
 - Top 5 global givers and receivers
 - Your personal top 5 recipients
 
+### 7. 🎭 Avocado Jokes
+Mention Bravocado with a trigger phrase to get a random avocado joke:
+- **Korean triggers:** `@Bravocado 잘 익었니?` or `@Bravocado 농담`
+- **English triggers:** `@Bravocado make it ripe` or `@Bravocado tell a joke`
+
 ---
 
 ## Tech Stack
@@ -110,6 +115,7 @@ CRON_SECRET=your-cron-secret
 - `message.channels` — Detect avocado messages
 - `reaction_added` — Detect avocado reactions
 - `app_home_opened` — Render the Home tab dashboard
+- `app_mention` — Respond to joke requests when mentioned
 
 ### 4. Deploy to Vercel
 
