@@ -1,8 +1,20 @@
 const { App, ExpressReceiver } = require('@slack/bolt');
 const { createClient } = require('@supabase/supabase-js');
 
-// 상수 정의
-const DEFAULT_DAILY_AVOCADOS = 5;
+// 공통 모듈
+const { sendDM, sendEphemeral, fetchMessage } = require('./lib/slack');
+const {
+    DEFAULT_DAILY_AVOCADOS,
+    countAvocados,
+    extractMentions,
+    parseAvocadoMessage,
+    getRemainingAvocados,
+    canDistribute,
+    excludeSender,
+    buildSenderSuccessMessage,
+    buildErrorMessage,
+    executeTransfers,
+} = require('./lib/avocado');
 
 // 환경 변수 로드
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
@@ -17,153 +29,149 @@ const app = new App({
     receiver: receiver,
 });
 
-// 아보카도 이모지 카운트 함수
-function countAvocados(text) {
-    const emojiMatches = text.match(/🥑/g) || [];
-    const slackMatches = text.match(/:avocado:/g) || [];
-    return emojiMatches.length + slackMatches.length;
-}
-
-// DM 전송 함수
-async function sendDM(userId, text) {
-    return app.client.chat.postMessage({ channel: userId, text });
-}
-
-// 메시지 파싱 함수
-function parseAvocadoMessage(message) {
-    if (message.subtype || message.bot_id) return null;
-
-    const sender = message.user;
-    const matches = message.text.match(/<@([A-Z0-9]+)>/g);
-    if (!matches) return null;
-
-    const avocadoCount = countAvocados(message.text);
-    if (avocadoCount === 0) return null;
-
-    const allReceiverIds = [...new Set(matches.map(m => m.replace(/[<@>]/g, '')))];
-    const selfIncluded = allReceiverIds.includes(sender);
-    const receiverIds = allReceiverIds.filter(id => id !== sender);
-
-    return { sender, receiverIds, avocadoCount, selfIncluded };
-}
-
-// 아보카도 분배 가능 여부 확인 (all-or-nothing)
-function canDistribute(receiverIds, avocadoCount, remaining) {
-    const totalNeeded = avocadoCount * receiverIds.length;
-    return totalNeeded <= remaining;
-}
-
-// 수신자 목록 포맷팅 (Oxford comma)
-function formatRecipientList(receiverIds) {
-    const formatter = new Intl.ListFormat('en', { style: 'long', type: 'conjunction' });
-    return formatter.format(receiverIds.map(id => `<@${id}>`));
-}
-
-// 결과 메시지 생성 (순수 함수)
-function buildResultMessage(successList, failedList, remainingAfter, selfIncluded) {
-    if (successList.length === 0) return null;
-
-    const avocadoCount = successList[0].count;
-    const countPlural = avocadoCount > 1 ? 's' : '';
-    const remainPlural = remainingAfter !== 1 ? 's' : '';
-    const recipientList = formatRecipientList(successList.map(s => s.receiverId));
-
-    let msg = `${recipientList} received *${avocadoCount} avo${countPlural}* from you. You have *${remainingAfter} avo${remainPlural}* left to give out today.`;
-
-    if (selfIncluded) {
-        msg += `\n(I skipped you, because you can't give avos to yourself!)`;
-    }
-
-    return msg;
-}
-
-// 아보카도 전송 처리 (DB 저장 + 수신자 DM)
-async function processAvocadoTransfers(distribution, sender, message) {
-    const successList = [];
-    const failedList = [];
-
-    for (const { receiverId, count } of distribution) {
-        if (count === 0) {
-            failedList.push(receiverId);
-            continue;
-        }
-
-        const { error } = await supabase.rpc('give_avocado', {
-            sender_id_input: sender,
-            receiver_id_input: receiverId,
-            count: count,
-            message_text: message.text,
-            channel_id_input: message.channel
-        });
-
-        if (!error) {
-            successList.push({ receiverId, count });
-            await sendDM(receiverId, `You received *${count} avo${count > 1 ? 's' : ''}* from <@${sender}> in <#${message.channel}>.\n> ${message.text}`);
-        } else {
-            failedList.push(receiverId);
-        }
-    }
-
-    return { successList, failedList };
-}
-
-// 아보카도 감지
-app.message(/:avocado:|🥑/, async ({ message }) => {
+// 아보카도 감지 (메시지 기반)
+app.message(/:avocado:|🥑/, async ({ message, client }) => {
     const parsed = parseAvocadoMessage(message);
     if (!parsed) return;
 
-    const { sender, receiverIds, avocadoCount, selfIncluded } = parsed;
+    const { sender, receiverIds: allReceiverIds, avocadoCount } = parsed;
+    const { filtered: receiverIds, selfIncluded } = excludeSender(allReceiverIds, sender);
 
     // 자기 자신에게만 보낸 경우
     if (receiverIds.length === 0) {
-        await app.client.chat.postEphemeral({
-            channel: message.channel,
-            user: sender,
-            text: `We love self-care, but avos are for sharing! 🥑 You can't give them to yourself.`
-        });
+        await sendEphemeral(client, message.channel, sender, buildErrorMessage('self_only'));
         return;
     }
 
     // 잔여 개수 확인
-    const { data: user } = await supabase.from('profiles').select('remaining_daily').eq('id', sender).single();
-    const remaining = user ? user.remaining_daily : DEFAULT_DAILY_AVOCADOS;
+    const remaining = await getRemainingAvocados(supabase, sender);
 
     if (remaining <= 0) {
-        await app.client.chat.postEphemeral({
-            channel: message.channel,
-            user: sender,
-            text: `You're too generous! You've used up your daily supply. You have *0 avos* left. Come back tomorrow to spread more love. 💚`
-        });
+        await sendEphemeral(client, message.channel, sender, buildErrorMessage('no_remaining'));
         return;
     }
 
     // All-or-nothing: 부족하면 아무에게도 보내지 않음
     if (!canDistribute(receiverIds, avocadoCount, remaining)) {
         const totalNeeded = avocadoCount * receiverIds.length;
-        const plural = remaining !== 1 ? 's' : '';
-        await app.client.chat.postEphemeral({
-            channel: message.channel,
-            user: sender,
-            text: `You tried to give *${totalNeeded} avo${totalNeeded > 1 ? 's' : ''}* to ${receiverIds.length} people, but you only have *${remaining} avo${plural}* left. No avos were sent. You have *${remaining} avo${plural}* left to give out today.`
-        });
+        await sendEphemeral(
+            client,
+            message.channel,
+            sender,
+            buildErrorMessage('insufficient', { remaining, totalNeeded, receiverCount: receiverIds.length })
+        );
         return;
     }
 
-    const distribution = receiverIds.map(id => ({ receiverId: id, count: avocadoCount }));
-    const { successList, failedList } = await processAvocadoTransfers(distribution, sender, message);
+    const { successList } = await executeTransfers({
+        supabase,
+        slackClient: client,
+        senderId: sender,
+        receiverIds,
+        avocadoCount,
+        context: {
+            type: 'message',
+            channelId: message.channel,
+            messageText: message.text,
+        },
+    });
 
     // 결과 DM 전송
     if (successList.length > 0) {
-        const { data: updatedUser } = await supabase
-            .from('profiles')
-            .select('remaining_daily')
-            .eq('id', sender)
-            .single();
-        const remainingAfter = updatedUser ? updatedUser.remaining_daily : 0;
-
-        const resultMessage = buildResultMessage(successList, failedList, remainingAfter, selfIncluded);
+        const remainingAfter = await getRemainingAvocados(supabase, sender);
+        const resultMessage = buildSenderSuccessMessage({ successList, remainingAfter, selfIncluded });
         if (resultMessage) {
-            await sendDM(sender, resultMessage);
+            await sendDM(client, sender, resultMessage);
+        }
+    }
+});
+
+// 리액션 기반 아보카도 전송
+app.event('reaction_added', async ({ event, client }) => {
+    // avocado 리액션만 처리 (한국어 설정: "아보카도")
+    if (!['avocado', '아보카도'].includes(event.reaction)) return;
+
+    const senderId = event.user;
+    const channelId = event.item.channel;
+    const messageTs = event.item.ts;
+
+    // 원본 메시지 조회
+    let originalMessage;
+    try {
+        originalMessage = await fetchMessage(client, channelId, messageTs);
+    } catch (error) {
+        // 메시지 조회 실패 시 조용히 종료 (권한 문제 등)
+        return;
+    }
+
+    if (!originalMessage) return;
+
+    const messageAuthor = originalMessage.user;
+    const messageText = originalMessage.text || '';
+
+    // 수신자 결정: 메시지에 멘션된 사람들이 있으면 그들에게, 없으면 메시지 작성자에게
+    const mentionedUsers = extractMentions(messageText);
+
+    let targetReceivers;
+    if (mentionedUsers.length > 0) {
+        // 멘션이 있으면 멘션된 사람들에게
+        targetReceivers = mentionedUsers;
+    } else {
+        // 멘션이 없으면 메시지 작성자에게 (단, 자기 메시지면 에러)
+        if (senderId === messageAuthor) {
+            await sendEphemeral(client, channelId, senderId, buildErrorMessage('self_only'));
+            return;
+        }
+        targetReceivers = [messageAuthor];
+    }
+
+    const { filtered: receiverIds, selfIncluded } = excludeSender(targetReceivers, senderId);
+
+    if (receiverIds.length === 0) {
+        await sendEphemeral(client, channelId, senderId, buildErrorMessage('self_only'));
+        return;
+    }
+
+    // 잔여 개수 확인
+    const remaining = await getRemainingAvocados(supabase, senderId);
+
+    if (remaining <= 0) {
+        await sendEphemeral(client, channelId, senderId, buildErrorMessage('no_remaining'));
+        return;
+    }
+
+    const avocadoCount = 1; // 리액션은 항상 1개
+
+    if (!canDistribute(receiverIds, avocadoCount, remaining)) {
+        const totalNeeded = avocadoCount * receiverIds.length;
+        await sendEphemeral(
+            client,
+            channelId,
+            senderId,
+            buildErrorMessage('insufficient', { remaining, totalNeeded, receiverCount: receiverIds.length })
+        );
+        return;
+    }
+
+    const { successList } = await executeTransfers({
+        supabase,
+        slackClient: client,
+        senderId,
+        receiverIds,
+        avocadoCount,
+        context: {
+            type: 'reaction',
+            channelId,
+            messageText,
+        },
+    });
+
+    // 결과 DM 전송
+    if (successList.length > 0) {
+        const remainingAfter = await getRemainingAvocados(supabase, senderId);
+        const resultMessage = buildSenderSuccessMessage({ successList, remainingAfter, selfIncluded });
+        if (resultMessage) {
+            await sendDM(client, senderId, resultMessage);
         }
     }
 });
@@ -188,7 +196,7 @@ function getGiverTitle(givenCount) {
     return 'Dirt Digger ⛏️';
 }
 
-// 🏠 Home Tab
+// Home Tab
 app.event('app_home_opened', async ({ event, client }) => {
     const userId = event.user;
 

@@ -21,6 +21,9 @@ When a teammate helps you out, simply send them an avocado emoji. Bravocado trac
 - **Simple Syntax:** Mention teammates and add `🥑` (or `:avocado:`) to your message.
 - **Multi-User Support:** `@Alice @Bob 🥑` sends 1 avocado to each person.
 - **Multi-Avocado Support:** `@Alice 🥑🥑` sends 2 avocados at once.
+- **Reaction Support:** Add `:avocado:` reaction to any message to send 1 avocado.
+  - React to someone else's message → sends to the message author.
+  - React to your own message with mentions → sends to the mentioned users.
 - **Smart Notifications:** Recipients get a DM with the sender's name, channel, and original message.
 
 ### 2. ⚖️ Fair Distribution (All-or-Nothing)
@@ -104,7 +107,8 @@ CRON_SECRET=your-cron-secret
 - `im:write` — Open and send DMs
 
 **Event Subscriptions:**
-- `message.channels` / `message.groups` — Detect avocado messages
+- `message.channels` — Detect avocado messages
+- `reaction_added` — Detect avocado reactions
 - `app_home_opened` — Render the Home tab dashboard
 
 ### 4. Deploy to Vercel
