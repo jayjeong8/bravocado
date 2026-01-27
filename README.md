@@ -107,7 +107,8 @@ CRON_SECRET=your-cron-secret
 - `im:write` — Open and send DMs
 
 **Event Subscriptions:**
-- `message.channels` / `message.groups` — Detect avocado messages
+- `message.channels` — Detect avocado messages
+- `reaction_added` — Detect avocado reactions
 - `app_home_opened` — Render the Home tab dashboard
 
 ### 4. Deploy to Vercel

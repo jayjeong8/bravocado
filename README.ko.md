@@ -105,7 +105,8 @@ CRON_SECRET=your-cron-secret
 - `im:write` — DM 열기 및 전송
 
 **Event Subscriptions:**
-- `message.channels` / `message.groups` — 아보카도 메시지 감지
+- `message.channels` — 아보카도 메시지 감지
+- `reaction_added` — 아보카도 리액션 감지
 - `app_home_opened` — 홈 탭 대시보드 렌더링
 
 ### 4. Vercel 배포
