@@ -26,11 +26,11 @@ async function handleJokeRequest({ event, say }) {
     const selectedJoke = jokes[Math.floor(Math.random() * jokes.length)];
 
     // Q 먼저 전송
-    await say(`*Q:* ${selectedJoke.q}`);
+    await say(`Q: ${selectedJoke.q}`);
 
     // 잠시 대기 후 A 전송
     await new Promise(resolve => setTimeout(resolve, 2000));
-    await say(`*A:* ${selectedJoke.a}`);
+    await say(`A: ${selectedJoke.a}`);
 }
 
 module.exports = { handleJokeRequest };
