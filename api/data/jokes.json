@@ -1,0 +1,22 @@
+{
+  "KR": [
+    { "q": "아보카도가 가장 좋아하는 걸그룹은?", "a": "'씨'스타" },
+    { "q": "아보카도가 늙으면 뭐가 될까요?", "a": "할아보카도" },
+    { "q": "아보카도가 편의점 알바를 하며 손님에게 하는 말은?", "a": "어서오십'씨'요~" },
+    { "q": "아보카도네 집안의 가훈은?", "a": "겉과 속이 다른 사람이 되지 말자." },
+    { "q": "아보카도가 즐겨 입는 옷은?", "a": "가죽 재킷" },
+    { "q": "아보카도를 가장 좋아하는 동물은?", "a": "오리. (꽥! 꽥! = Guac! Guac!)" },
+    { "q": "아보카도가 목욕탕에 가면 하는 말은?", "a": "'씨'원하다~" }
+  ],
+  "EN": [
+    { "q": "Why did the avocado go to the wedding?", "a": "To make a toast! 🥂" },
+    { "q": "How do avocados handle stress?", "a": "They just let it guac ❄️" },
+    { "q": "Why was the avocado investigation useless?", "a": "Because they couldn't find any hard evidence (just mush)." },
+    { "q": "What is an avocado's favorite sport?", "a": "Avocardio" },
+    { "q": "What did the avocado say to the bread?", "a": "I think we're meant to be toast-gether." },
+    { "q": "What's an avocado's favorite movie?", "a": "The Guac-dfather." },
+    { "q": "Why are avocados so good at keeping secrets?", "a": "Because they keep everything in their core." },
+    { "q": "What's an avocado's philosophy of life?", "a": "Live fast, die young, and leave a beautiful corpse." },
+    { "q": "What did the tortilla chip say to the avocado?", "a": "You complete me." }
+  ]
+}

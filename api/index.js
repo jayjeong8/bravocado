@@ -15,6 +15,7 @@ const {
     buildErrorMessage,
     executeTransfers,
 } = require('./lib/avocado');
+const { handleJokeRequest } = require("./lib/jokes");
 
 // 환경 변수 로드
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
@@ -304,6 +305,10 @@ app.event('app_home_opened', async ({ event, client }) => {
             ],
         },
     });
+});
+
+app.event('app_mention', async ({ event, say }) => {
+    await handleJokeRequest({ event, say });
 });
 
 module.exports = async (req, res) => {
