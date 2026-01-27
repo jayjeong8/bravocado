@@ -104,10 +104,11 @@ CRON_SECRET=your-cron-secret
 ### 3. Slack 앱 설정
 
 **Bot Token Scopes:**
+- `app_mentions:read` — 농담 요청을 위한 @Bravocado 멘션 감지
+- `channels:history` — 리액션 처리를 위한 메시지 내용 조회
 - `chat:write` — 메시지 및 임시 메시지 전송
-- `chat:write.public` — 봇이 참여하지 않은 채널에 전송
+- `reactions:read` — 아보카도 이모지 리액션 감지
 - `users:read` — 사용자 표시 이름 조회
-- `im:write` — DM 열기 및 전송
 
 **Event Subscriptions:**
 - `message.channels` — 아보카도 메시지 감지

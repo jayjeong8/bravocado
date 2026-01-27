@@ -106,10 +106,11 @@ CRON_SECRET=your-cron-secret
 ### 3. Slack App Configuration
 
 **Bot Token Scopes:**
+- `app_mentions:read` — Detect @Bravocado mentions for joke requests
+- `channels:history` — Read message content for reaction handling
 - `chat:write` — Post messages and ephemeral messages
-- `chat:write.public` — Post in channels the bot hasn't joined
+- `reactions:read` — Detect avocado emoji reactions
 - `users:read` — Fetch user display names
-- `im:write` — Open and send DMs
 
 **Event Subscriptions:**
 - `message.channels` — Detect avocado messages
