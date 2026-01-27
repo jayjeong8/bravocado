@@ -25,18 +25,12 @@ async function handleJokeRequest({ event, say }) {
     const jokes = isKr ? jokesData.KR : jokesData.EN;
     const selectedJoke = jokes[Math.floor(Math.random() * jokes.length)];
 
-    // 슬랙 메시지 전송
-    await say({
-        blocks: [
-            {
-                type: "section",
-                text: {
-                    type: "mrkdwn",
-                    text: `*Q:* ${selectedJoke.q}\n*A:* ${selectedJoke.a}`
-                }
-            },
-        ]
-    });
+    // Q 먼저 전송
+    await say(`*Q:* ${selectedJoke.q}`);
+
+    // 잠시 대기 후 A 전송
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    await say(`*A:* ${selectedJoke.a}`);
 }
 
 module.exports = { handleJokeRequest };
