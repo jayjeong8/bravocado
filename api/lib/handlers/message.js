@@ -1,4 +1,4 @@
-const { sendDM, sendEphemeral } = require('../lib/slack');
+const { sendDM, sendEphemeral } = require('../slack');
 const {
     parseAvocadoMessage,
     getRemainingAvocados,
@@ -7,7 +7,7 @@ const {
     buildSenderSuccessMessage,
     buildErrorMessage,
     executeTransfers,
-} = require('../lib/avocado');
+} = require('../avocado');
 
 /**
  * 메시지 기반 아보카도 전송 핸들러를 생성합니다.

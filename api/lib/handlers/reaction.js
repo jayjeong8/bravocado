@@ -1,4 +1,4 @@
-const { sendDM, sendEphemeral, fetchMessage } = require('../lib/slack');
+const { sendDM, sendEphemeral, fetchMessage } = require('../slack');
 const {
     extractMentions,
     getRemainingAvocados,
@@ -7,7 +7,7 @@ const {
     buildSenderSuccessMessage,
     buildErrorMessage,
     executeTransfers,
-} = require('../lib/avocado');
+} = require('../avocado');
 
 const AVOCADO_REACTIONS = ['avocado', '아보카도'];
 const REACTION_AVOCADO_COUNT = 1;

@@ -1,5 +1,5 @@
-const { DEFAULT_DAILY_AVOCADOS } = require('../lib/avocado');
-const { getTitle, getGiverTitle } = require('../lib/titles');
+const { DEFAULT_DAILY_AVOCADOS } = require('../avocado');
+const { getTitle, getGiverTitle } = require('../titles');
 
 /**
  * Home Tab 핸들러를 생성합니다.
