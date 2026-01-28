@@ -15,6 +15,14 @@ const receiver = new ExpressReceiver({
     processBeforeResponse: true,
 });
 
+// 재시도 요청 무시 (중복 처리 방지)
+receiver.router.use((req, res, next) => {
+    if (req.headers['x-slack-retry-num']) {
+        return res.status(200).send();
+    }
+    next();
+});
+
 const app = new App({
     token: process.env.SLACK_BOT_TOKEN,
     receiver: receiver,
