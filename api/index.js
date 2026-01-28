@@ -2,10 +2,10 @@ const { App, ExpressReceiver } = require('@slack/bolt');
 const { createClient } = require('@supabase/supabase-js');
 
 // 핸들러
-const { createMessageHandler } = require('./lib/handlers/message');
-const { createReactionHandler } = require('./lib/handlers/reaction');
-const { createHomeHandler } = require('./lib/handlers/home');
-const { handleJokeRequest } = require('./lib/jokes');
+const { createMessageHandler } = require('../lib/handlers/message');
+const { createReactionHandler } = require('../lib/handlers/reaction');
+const { createHomeHandler } = require('../lib/handlers/home');
+const { handleJokeRequest } = require('../lib/jokes');
 
 // 환경 변수 로드
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
