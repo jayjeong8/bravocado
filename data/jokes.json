@@ -7,18 +7,18 @@
     { "type": "qa", "q": "아보카도가 즐겨 입는 옷은?", "a": "가죽 재킷" },
     { "type": "qa", "q": "아보카도를 가장 좋아하는 동물은?", "a": "오리. (꽥! 꽥! = Guac! Guac!)" },
     { "type": "qa", "q": "아보카도가 목욕탕에 가면 하는 말은?", "a": "'씨'원하다~" },
-    { "type": "qa", "q": "아보카도 4개를 뭐라할까?", "a": "아보-콰트로~ Avo-cuatro~!", "author": "Eden" },
-    { "type": "qa", "q": "세상의 종말을 영어로 뭐라고 해?", "a": "아보칼립스", "author": "Brice" },
-    { "type": "qa", "q": "좋아하는 가수가 있어?", "a": "카도가든", "author": "Brice" },
-    { "type": "qa", "q": "네가 좋아하는 숫자는 뭐야?", "a": "6.02214076×10^23", "author": "Brice" },
-    { "type": "qa", "q": "영어를 잘하는 비법이요?", "a": "문법공부랑 실전회화 공부도 하고요! 아! Voca도 챙겨야죠!", "author": "Eden" },
+    { "type": "qa", "q": "아보카도 4개를 뭐라할까?", "a": "아보-콰트로~ Avo-cuatro~!", "author": "eden" },
+    { "type": "qa", "q": "세상의 종말을 영어로 뭐라고 해?", "a": "아보칼립스", "author": "brice" },
+    { "type": "qa", "q": "좋아하는 가수가 있어?", "a": "카도가든", "author": "brice" },
+    { "type": "qa", "q": "네가 좋아하는 숫자는 뭐야?", "a": "6.02214076×10^23", "author": "brice" },
+    { "type": "qa", "q": "영어를 잘하는 비법이요?", "a": "문법공부랑 실전회화 공부도 하고요! 아! Voca도 챙겨야죠!", "author": "eden" },
     {
       "type": "dialogue",
       "lines": [
         { "speaker": "A", "text": "아보카도 4행시" },
         { "speaker": "A", "text": "아: 아 드디어..\n보: 보라\n카: 카이\n도: 도착" }
       ],
-      "author": "Crow"
+      "author": "crow"
     },
     {
       "type": "dialogue",
@@ -33,7 +33,7 @@
         { "speaker": "A", "text": "난 사실 아보카도의 탈을 쓴 타코야." },
         { "speaker": "A", "text": "넝~담 ㅎ" }
       ],
-      "author": "Brice"
+      "author": "brice"
     },
     {
       "type": "dialogue",
@@ -41,12 +41,11 @@
         { "speaker": "A", "text": "아아, 여기는 알파카도, 들리나? 오버." },
         { "speaker": "B", "text": "여기는 브라보카도, 잘 들린다 오버." }
       ],
-      "author": "Brice"
+      "author": "brice"
     },
     {
       "type": "dialogue",
       "lines": [
-        { "speaker": "wynn", "text": "아보카든 4행시" },
         { "speaker": "wynn", "text": "아: 아 이가\n보: 보 라색\n카: 카레 를 먹었다.\n든: 든 든하니?" },
         { "speaker": "wynn", "text": "아 아보카든이 아니네" }
       ],
@@ -58,7 +57,7 @@
         { "speaker": "로사", "text": "가라 아보크! 지우 녀석들을 혼내주는거야!" },
         { "speaker": "로사", "text": "아 아니..! 아보크가 진화해서 아보카도가 되었어!" }
       ],
-      "author": "Brice"
+      "author": "brice"
     }
   ],
   "EN": [
@@ -71,7 +70,7 @@
     { "type": "qa", "q": "Why are avocados so good at keeping secrets?", "a": "Because they keep everything in their core." },
     { "type": "qa", "q": "What's an avocado's philosophy of life?", "a": "Live fast, die young, and leave a beautiful corpse." },
     { "type": "qa", "q": "What did the tortilla chip say to the avocado?", "a": "You complete me." },
-    { "type": "qa", "q": "Why doesn't the avocado go to the gym?", "a": "It's been hardcore since birth!", "author": "Eden" },
-    { "type": "qa", "q": "How do you make an avocado disappear?", "a": "Say \"Avocadabra!\" 아보카다브라!", "author": "Eden" }
+    { "type": "qa", "q": "Why doesn't the avocado go to the gym?", "a": "It's been hardcore since birth!", "author": "eden" },
+    { "type": "qa", "q": "How do you make an avocado disappear?", "a": "Say \"Avocadabra!\" 아보카다브라!", "author": "eden" }
   ]
 }
