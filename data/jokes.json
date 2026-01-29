@@ -1,22 +1,100 @@
 {
   "KR": [
-    { "q": "아보카도가 가장 좋아하는 걸그룹은?", "a": "'씨'스타" },
-    { "q": "아보카도가 늙으면 뭐가 될까요?", "a": "할아보카도" },
-    { "q": "아보카도가 편의점 알바를 하며 손님에게 하는 말은?", "a": "어서오십'씨'요~" },
-    { "q": "아보카도네 집안의 가훈은?", "a": "겉과 속이 다른 사람이 되지 말자." },
-    { "q": "아보카도가 즐겨 입는 옷은?", "a": "가죽 재킷" },
-    { "q": "아보카도를 가장 좋아하는 동물은?", "a": "오리. (꽥! 꽥! = Guac! Guac!)" },
-    { "q": "아보카도가 목욕탕에 가면 하는 말은?", "a": "'씨'원하다~" }
+    { "type": "qa", "q": "아보카도가 가장 좋아하는 걸그룹은?", "a": "'씨'스타" },
+    { "type": "qa", "q": "아보카도가 늙으면 뭐가 될까요?", "a": "할아보카도" },
+    { "type": "qa", "q": "아보카도가 편의점 알바를 하며 손님에게 하는 말은?", "a": "어서오십'씨'요~" },
+    { "type": "qa", "q": "아보카도네 집안의 가훈은?", "a": "겉과 속이 다른 사람이 되지 말자." },
+    { "type": "qa", "q": "아보카도가 즐겨 입는 옷은?", "a": "가죽 재킷" },
+    { "type": "qa", "q": "아보카도를 가장 좋아하는 동물은?", "a": "오리. (꽥! 꽥! = Guac! Guac!)" },
+    { "type": "qa", "q": "아보카도가 목욕탕에 가면 하는 말은?", "a": "'씨'원하다~" },
+    { "type": "qa", "q": "아보카도 4개를 뭐라할까?", "a": "아보-콰트로~!", "author": "eden" },
+    { "type": "qa", "q": "세상의 종말을 영어로 뭐라고 해?", "a": "아보칼립스", "author": "brice" },
+    { "type": "qa", "q": "좋아하는 가수가 있어?", "a": "카도가든", "author": "brice" },
+    { "type": "qa", "q": "네가 좋아하는 숫자는 뭐야?", "a": "6.02214076×10^23", "author": "brice" },
+    { "type": "qa", "q": "영어를 잘하는 비법이요?", "a": "문법공부랑 실전회화 공부도 하고요! 아! Voca도 챙겨야죠!", "author": "eden" },
+    { "type": "qa", "q": "아보카도를 사라지게 하려면?", "a": "아보카다브라!", "author": "eden" },
+    {
+      "type": "dialogue",
+      "lines": [
+        { "speaker": "A", "text": "아보카도 4행시" },
+        { "speaker": "A", "text": "\n아: 아 드디어..\n보: 보라\n카: 카이\n도: 도착" }
+      ],
+      "author": "crow"
+    },
+    {
+      "type": "dialogue",
+      "lines": [
+        { "speaker": "A", "text": "난 사실 아보카도의 탈을 쓴 타코야." },
+        { "speaker": "A", "text": "넝~담 ㅎ" }
+      ],
+      "author": "brice"
+    },
+    {
+      "type": "dialogue",
+      "lines": [
+        { "speaker": "A", "text": "아아, 여기는 알파카도, 들리나? 오버." },
+        { "speaker": "B", "text": "여기는 브라보카도, 잘 들린다 오버." }
+      ],
+      "author": "brice"
+    },
+    {
+      "type": "dialogue",
+      "lines": [
+        { "speaker": "wynn", "text": "\n아: 아이가\n보: 보라색\n카: 카레를 먹었다.\n든: 든든하니?" },
+        { "speaker": "wynn", "text": "아 아보카든이 아니네" }
+      ],
+      "author": "wynn"
+    },
+    {
+      "type": "dialogue",
+      "lines": [
+        { "speaker": "로사", "text": "가라 아보크! 지우 녀석들을 혼내주는거야!" },
+        { "speaker": "로사", "text": "아 아니..! 아보크가 진화해서 아보카도가 되었어!" }
+      ],
+      "author": "brice"
+    },
+    { "type": "qa", "q": "아보카도가 가장 좋아하는 운동은?", "a": "아보카디오 (Avocardio)" },
+    { "type": "qa", "q": "아보카도가 가장 좋아하는 영화는?", "a": "대부 (The Guac-dfather)" },
+    { "type": "qa", "q": "아보카도는 왜 헬스장에 안 갈까?", "a": "원래부터 코어가 단단하거든!", "author": "eden" },
+    { "type": "qa", "q": "또띠아 칩이 아보카도에게 한 말은?", "a": "넌 날 완성시켜." },
+    {
+      "type": "dialogue",
+      "lines": [
+        { "speaker": "A", "text": "여보 마트가서 우유사고 만약에 아보카도 있으면 6개 사와" },
+        { "speaker": "B", "text": "🥛🥛🥛🥛🥛🥛" }
+      ]
+    }
   ],
   "EN": [
-    { "q": "Why did the avocado go to the wedding?", "a": "To make a toast! 🥂" },
-    { "q": "How do avocados handle stress?", "a": "They just let it guac ❄️" },
-    { "q": "Why was the avocado investigation useless?", "a": "Because they couldn't find any hard evidence (just mush)." },
-    { "q": "What is an avocado's favorite sport?", "a": "Avocardio" },
-    { "q": "What did the avocado say to the bread?", "a": "I think we're meant to be toast-gether." },
-    { "q": "What's an avocado's favorite movie?", "a": "The Guac-dfather." },
-    { "q": "Why are avocados so good at keeping secrets?", "a": "Because they keep everything in their core." },
-    { "q": "What's an avocado's philosophy of life?", "a": "Live fast, die young, and leave a beautiful corpse." },
-    { "q": "What did the tortilla chip say to the avocado?", "a": "You complete me." }
+    { "type": "qa", "q": "Why did the avocado go to the wedding?", "a": "To make a toast! 🥂" },
+    { "type": "qa", "q": "How do avocados handle stress?", "a": "They just let it guac ❄️" },
+    { "type": "qa", "q": "Why was the avocado investigation useless?", "a": "Because they couldn't find any hard evidence (just mush)." },
+    { "type": "qa", "q": "What is an avocado's favorite sport?", "a": "Avocardio" },
+    { "type": "qa", "q": "What did the avocado say to the bread?", "a": "I think we're meant to be toast-gether." },
+    { "type": "qa", "q": "What's an avocado's favorite movie?", "a": "The Guac-dfather." },
+    { "type": "qa", "q": "Why are avocados so good at keeping secrets?", "a": "Because they keep everything in their core." },
+    { "type": "qa", "q": "What's an avocado's philosophy of life?", "a": "Live fast, die young, and leave a beautiful corpse." },
+    { "type": "qa", "q": "What did the tortilla chip say to the avocado?", "a": "You complete me." },
+    { "type": "qa", "q": "Why doesn't the avocado go to the gym?", "a": "It's been hardcore since birth!", "author": "eden" },
+    { "type": "qa", "q": "How do you make an avocado disappear?", "a": "Say \"Avocadabra!\"", "author": "eden" },
+    { "type": "qa", "q": "What's an avocado's family motto?", "a": "Don't be someone whose outside and inside are different." },
+    { "type": "qa", "q": "What's an avocado's favorite clothing?", "a": "A leather jacket." },
+    { "type": "qa", "q": "What's an avocado's favorite number?", "a": "6.02214076×10²³", "author": "brice" },
+    { "type": "qa", "q": "What do you call the end of the world for avocados?", "a": "The Avo-calypse!", "author": "brice" },
+    {
+      "type": "dialogue",
+      "lines": [
+        { "speaker": "A", "text": "Honey, go to the store, buy milk, and if they have avocados, get 6." },
+        { "speaker": "B", "text": "🥛🥛🥛🥛🥛🥛" }
+      ]
+    },
+    {
+      "type": "dialogue",
+      "lines": [
+        { "speaker": "A", "text": "Alpha-cado here, do you copy? Over." },
+        { "speaker": "B", "text": "Bravo-cado here, loud and clear. Over." }
+      ],
+      "author": "brice"
+    }
   ]
 }
