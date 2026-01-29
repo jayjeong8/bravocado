@@ -23,6 +23,14 @@
     {
       "type": "dialogue",
       "lines": [
+        { "speaker": "A", "text": "아보카도 4행시" },
+        { "speaker": "A", "text": "아: 아 드디어..\n보: 보람찬 하루가\n카: 카운트다운에 들어갔다\n도: 도망쳐~!" }
+      ],
+      "author": "crow"
+    },
+    {
+      "type": "dialogue",
+      "lines": [
         { "speaker": "A", "text": "난 사실 아보카도의 탈을 쓴 타코야." },
         { "speaker": "A", "text": "넝~담 ㅎ" }
       ],
