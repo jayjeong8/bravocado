@@ -17,16 +17,9 @@
       "type": "dialogue",
       "lines": [
         { "speaker": "A", "text": "아보카도 4행시" },
-        { "speaker": "A", "text": "아: 아 드디어..\n보: 보라\n카: 카이\n도: 도착" }
+        { "speaker": "A", "text": "\n아: 아 드디어..\n보: 보라\n카: 카이\n도: 도착" }
       ],
       "author": "crow"
-    },
-    {
-      "type": "dialogue",
-      "lines": [
-        { "speaker": "A", "text": "아보카도 4행시" },
-        { "speaker": "A", "text": "아: 아 드디어..\n보: 보람찬 하루가\n카: 카운트다운에 들어갔다\n도: 도망쳐" }
-      ]
     },
     {
       "type": "dialogue",
@@ -47,7 +40,7 @@
     {
       "type": "dialogue",
       "lines": [
-        { "speaker": "wynn", "text": "아: 아 이가\n보: 보 라색\n카: 카레 를 먹었다.\n든: 든 든하니?" },
+        { "speaker": "wynn", "text": "\n아: 아이가\n보: 보라색\n카: 카레를 먹었다.\n든: 든든하니?" },
         { "speaker": "wynn", "text": "아 아보카든이 아니네" }
       ],
       "author": "wynn"
