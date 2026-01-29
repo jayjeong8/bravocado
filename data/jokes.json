@@ -12,6 +12,7 @@
     { "type": "qa", "q": "좋아하는 가수가 있어?", "a": "카도가든", "author": "brice" },
     { "type": "qa", "q": "네가 좋아하는 숫자는 뭐야?", "a": "6.02214076×10^23", "author": "brice" },
     { "type": "qa", "q": "영어를 잘하는 비법이요?", "a": "문법공부랑 실전회화 공부도 하고요! 아! Voca도 챙겨야죠!", "author": "eden" },
+    { "type": "qa", "q": "아보카도를 사라지게 하려면?", "a": "아보카다브라!", "author": "eden" },
     {
       "type": "dialogue",
       "lines": [
@@ -82,17 +83,15 @@
     { "type": "qa", "q": "What's an avocado's philosophy of life?", "a": "Live fast, die young, and leave a beautiful corpse." },
     { "type": "qa", "q": "What did the tortilla chip say to the avocado?", "a": "You complete me." },
     { "type": "qa", "q": "Why doesn't the avocado go to the gym?", "a": "It's been hardcore since birth!", "author": "eden" },
-    { "type": "qa", "q": "How do you make an avocado disappear?", "a": "Say \"Avocadabra!\" 아보카다브라!", "author": "eden" },
-    { "type": "qa", "q": "What do you call an old avocado?", "a": "Grandpa-vocado!" },
+    { "type": "qa", "q": "How do you make an avocado disappear?", "a": "Say \"Avocadabra!\"", "author": "eden" },
     { "type": "qa", "q": "What's an avocado's family motto?", "a": "Don't be someone whose outside and inside are different." },
     { "type": "qa", "q": "What's an avocado's favorite clothing?", "a": "A leather jacket." },
-    { "type": "qa", "q": "What's an avocado's favorite number?", "a": "6.02214076×10²³ (Avogadro's number)", "author": "brice" },
+    { "type": "qa", "q": "What's an avocado's favorite number?", "a": "6.02214076×10²³", "author": "brice" },
     { "type": "qa", "q": "What do you call the end of the world for avocados?", "a": "The Avo-calypse!", "author": "brice" },
     {
       "type": "dialogue",
       "lines": [
         { "speaker": "A", "text": "Honey, go to the store, buy milk, and if they have avocados, get 6." },
-        { "speaker": "B", "text": "(They had avocados)" },
         { "speaker": "B", "text": "🥛🥛🥛🥛🥛🥛" }
       ]
     },
