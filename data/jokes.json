@@ -23,13 +23,6 @@
     {
       "type": "dialogue",
       "lines": [
-        { "speaker": "A", "text": "여보 마트가서 우유사고 만약에 아보카도 있으면 6개 사와" },
-        { "speaker": "B", "text": "🥛🥛🥛🥛🥛🥛" }
-      ]
-    },
-    {
-      "type": "dialogue",
-      "lines": [
         { "speaker": "A", "text": "난 사실 아보카도의 탈을 쓴 타코야." },
         { "speaker": "A", "text": "넝~담 ㅎ" }
       ],
@@ -58,6 +51,20 @@
         { "speaker": "로사", "text": "아 아니..! 아보크가 진화해서 아보카도가 되었어!" }
       ],
       "author": "brice"
+    },
+    { "type": "qa", "q": "아보카도가 가장 좋아하는 운동은?", "a": "아보카디오 (Avocardio)" },
+    { "type": "qa", "q": "아보카도가 가장 좋아하는 영화는?", "a": "대부 (The Guac-dfather)" },
+    { "type": "qa", "q": "아보카도는 왜 비밀을 잘 지킬까?", "a": "모든 걸 핵심(씨)에 담아두거든." },
+    { "type": "qa", "q": "아보카도는 왜 헬스장에 안 갈까?", "a": "태어날 때부터 하드코어(씨)니까!", "author": "eden" },
+    { "type": "qa", "q": "또띠아 칩이 아보카도에게 한 말은?", "a": "넌 날 완성시켜. (과카몰리)" },
+    { "type": "qa", "q": "아보카도가 빵에게 한 말은?", "a": "우린 토스트-게더 (toast-gether) 할 운명이야." },
+    {
+      "type": "dialogue",
+      "lines": [
+        { "speaker": "A", "text": "여보 마트가서 우유사고 만약에 아보카도 있으면 6개 사와" },
+        { "speaker": "B", "text": "(아보카도가 있었다)" },
+        { "speaker": "B", "text": "🥛🥛🥛🥛🥛🥛" }
+      ]
     }
   ],
   "EN": [
@@ -71,6 +78,27 @@
     { "type": "qa", "q": "What's an avocado's philosophy of life?", "a": "Live fast, die young, and leave a beautiful corpse." },
     { "type": "qa", "q": "What did the tortilla chip say to the avocado?", "a": "You complete me." },
     { "type": "qa", "q": "Why doesn't the avocado go to the gym?", "a": "It's been hardcore since birth!", "author": "eden" },
-    { "type": "qa", "q": "How do you make an avocado disappear?", "a": "Say \"Avocadabra!\" 아보카다브라!", "author": "eden" }
+    { "type": "qa", "q": "How do you make an avocado disappear?", "a": "Say \"Avocadabra!\" 아보카다브라!", "author": "eden" },
+    { "type": "qa", "q": "What do you call an old avocado?", "a": "Grandpa-vocado!" },
+    { "type": "qa", "q": "What's an avocado's family motto?", "a": "Don't be someone whose outside and inside are different." },
+    { "type": "qa", "q": "What's an avocado's favorite clothing?", "a": "A leather jacket." },
+    { "type": "qa", "q": "What's an avocado's favorite number?", "a": "6.02214076×10²³ (Avogadro's number)", "author": "brice" },
+    { "type": "qa", "q": "What do you call the end of the world for avocados?", "a": "The Avo-calypse!", "author": "brice" },
+    {
+      "type": "dialogue",
+      "lines": [
+        { "speaker": "A", "text": "Honey, go to the store, buy milk, and if they have avocados, get 6." },
+        { "speaker": "B", "text": "(They had avocados)" },
+        { "speaker": "B", "text": "🥛🥛🥛🥛🥛🥛" }
+      ]
+    },
+    {
+      "type": "dialogue",
+      "lines": [
+        { "speaker": "A", "text": "Alpha-cado here, do you copy? Over." },
+        { "speaker": "B", "text": "Bravo-cado here, loud and clear. Over." }
+      ],
+      "author": "brice"
+    }
   ]
 }
