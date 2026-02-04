@@ -5,6 +5,7 @@ const { createClient } = require('@supabase/supabase-js');
 const { createMessageHandler } = require('../lib/handlers/message');
 const { createReactionHandler } = require('../lib/handlers/reaction');
 const { createHomeHandler } = require('../lib/handlers/home');
+const { createTacoMessageHandler, createTacoReactionHandler } = require('../lib/handlers/taco');
 const { handleJokeRequest } = require('../lib/jokes');
 
 // 환경 변수 로드
@@ -30,7 +31,9 @@ const app = new App({
 
 // 핸들러 등록
 app.message(/:avocado:|🥑/, createMessageHandler(supabase));
+app.message(/:taco:|🌮/, createTacoMessageHandler());
 app.event('reaction_added', createReactionHandler(supabase));
+app.event('reaction_added', createTacoReactionHandler());
 app.event('app_home_opened', createHomeHandler(supabase));
 app.event('app_mention', async ({ event, say }) => {
     await handleJokeRequest({ event, say });
