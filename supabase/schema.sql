@@ -34,6 +34,11 @@ begin
   insert into profiles (id, remaining_daily) values (sender_id_input, 5) on conflict (id) do nothing;
   insert into profiles (id, received_count) values (receiver_id_input, 0) on conflict (id) do nothing;
 
+  -- Verify sufficient avocados remain (prevents race condition overdraft)
+  if (select remaining_daily from profiles where id = sender_id_input) < count then
+    raise exception 'insufficient_avocados';
+  end if;
+
   -- Update counters
   update profiles set remaining_daily = remaining_daily - count, given_count = given_count + count where id = sender_id_input;
   update profiles set received_count = received_count + count where id = receiver_id_input;
