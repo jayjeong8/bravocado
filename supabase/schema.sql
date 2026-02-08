@@ -18,8 +18,14 @@ create table transactions (
   icon_type text,
   message_text text,
   channel_id text,
+  event_id text,
   created_at timestamp with time zone default timezone('utc'::text, now())
 );
+
+-- Prevent duplicate transactions from retried Slack events
+create unique index uq_transactions_event_receiver
+  on transactions (event_id, receiver_id)
+  where event_id is not null;
 
 -- 3. Give avocado function (transactional)
 create or replace function give_avocado(
@@ -27,20 +33,34 @@ create or replace function give_avocado(
   receiver_id_input text,
   count int,
   message_text text,
-  channel_id_input text
+  channel_id_input text,
+  event_id_input text default null
 ) returns void as $$
 begin
+  -- Skip duplicate events (idempotency guard)
+  if event_id_input is not null and exists (
+    select 1 from transactions
+    where event_id = event_id_input and receiver_id = receiver_id_input
+  ) then
+    return;
+  end if;
+
   -- Auto-create profiles if not exists
   insert into profiles (id, remaining_daily) values (sender_id_input, 5) on conflict (id) do nothing;
   insert into profiles (id, received_count) values (receiver_id_input, 0) on conflict (id) do nothing;
+
+  -- Verify sufficient avocados remain (prevents race condition overdraft)
+  if (select remaining_daily from profiles where id = sender_id_input) < count then
+    raise exception 'insufficient_avocados';
+  end if;
 
   -- Update counters
   update profiles set remaining_daily = remaining_daily - count, given_count = given_count + count where id = sender_id_input;
   update profiles set received_count = received_count + count where id = receiver_id_input;
 
   -- Log transaction
-  insert into transactions (sender_id, receiver_id, count, icon_type, message_text, channel_id)
-  values (sender_id_input, receiver_id_input, count, 'avocado', message_text, channel_id_input);
+  insert into transactions (sender_id, receiver_id, count, icon_type, message_text, channel_id, event_id)
+  values (sender_id_input, receiver_id_input, count, 'avocado', message_text, channel_id_input, event_id_input);
 end;
 $$ language plpgsql;
 
