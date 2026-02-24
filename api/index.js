@@ -16,14 +16,6 @@ const receiver = new ExpressReceiver({
     processBeforeResponse: true,
 });
 
-// 재시도 요청 무시 (중복 처리 방지)
-receiver.router.use((req, res, next) => {
-    if (req.headers['x-slack-retry-num']) {
-        return res.status(200).send();
-    }
-    next();
-});
-
 const app = new App({
     token: process.env.SLACK_BOT_TOKEN,
     receiver: receiver,
@@ -41,6 +33,11 @@ app.event('app_mention', async ({ event, say }) => {
 
 // Vercel 엔트리포인트
 module.exports = async (req, res) => {
+    // 재시도 요청 무시 (중복 처리 방지)
+    if (req.headers['x-slack-retry-num']) {
+        return res.status(200).send();
+    }
+
     // Body가 문자열인 경우 파싱
     let body = req.body;
     if (typeof body === 'string') {

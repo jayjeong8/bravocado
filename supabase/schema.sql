@@ -6,7 +6,8 @@ create table profiles (
   id text primary key,
   given_count int default 0,
   received_count int default 0,
-  remaining_daily int default 5
+  remaining_daily int default 5,
+  constraint remaining_daily_non_negative check (remaining_daily >= 0)
 );
 
 -- 2. Transactions table
@@ -49,8 +50,8 @@ begin
   insert into profiles (id, remaining_daily) values (sender_id_input, 5) on conflict (id) do nothing;
   insert into profiles (id, received_count) values (receiver_id_input, 0) on conflict (id) do nothing;
 
-  -- Verify sufficient avocados remain (prevents race condition overdraft)
-  if (select remaining_daily from profiles where id = sender_id_input) < count then
+  -- Verify sufficient avocados remain (FOR UPDATE prevents race condition overdraft)
+  if (select remaining_daily from profiles where id = sender_id_input for update) < count then
     raise exception 'insufficient_avocados';
   end if;
 
